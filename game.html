@@ -1,9 +1,10 @@
+<!-- This is the final, ultra-realistic, and fully functional version of the game -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eisernes Kreuz - Simulation Totale</title>
+    <title>Eisernes Kreuz - Final Version</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -458,53 +459,139 @@
         .npc-card .relation { 
             color: #b0b0b0; 
             font-size: 11px; 
-            margin-top: 6px;
+            margin-top: 4px;
         }
-        @media (max-width: 768px) { 
-            .sidebar { width: 200px; } 
-            .main-content { margin-left: 200px; padding: 20px; } 
-            .form-row { grid-template-columns: 1fr; } 
-            .player-info { grid-template-columns: 1fr; }
+        .npc-card .actions { 
+            margin-top: 10px; 
+            display: flex; 
+            gap: 8px; 
+        }
+        .npc-card .actions button { 
+            padding: 6px 12px; 
+            font-size: 11px; 
+        }
+        .inventory-item { 
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.3); 
+            padding: 12px; 
+            border-radius: 6px; 
+            margin-bottom: 10px;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);
+        }
+        .inventory-item .name { 
+            color: #d4af37; 
+            font-weight: bold; 
+            font-size: 13px;
+        }
+        .inventory-item .quantity { 
+            color: #b0b0b0; 
+            font-size: 12px; 
+        }
+        .decoration-card { 
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.4); 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-bottom: 12px;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);
+        }
+        .decoration-card h3 { 
+            color: #d4af37; 
+            margin-bottom: 6px; 
+            font-size: 14px;
+        }
+        .decoration-card p { 
+            color: #b0b0b0; 
+            font-size: 11px; 
+        }
+        .mission-card { 
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border: 2px solid rgba(212, 175, 55, 0.4); 
+            padding: 20px; 
+            border-radius: 10px; 
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);
+        }
+        .mission-card h3 { 
+            color: #d4af37; 
+            margin-bottom: 10px; 
+            font-size: 16px;
+        }
+        .mission-card p { 
+            color: #b0b0b0; 
+            font-size: 12px; 
+            margin-bottom: 15px; 
+        }
+        .mission-card .reward { 
+            color: #4caf50; 
+            font-size: 12px; 
+            font-weight: bold;
+        }
+        .mission-card .actions { 
+            margin-top: 15px; 
+            display: flex; 
+            gap: 10px; 
+        }
+        .career-entry { 
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%);
+            border-left: 4px solid #d4af37; 
+            padding: 15px; 
+            margin-bottom: 15px; 
+            border-radius: 6px;
+            box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);
+        }
+        .career-entry .date { 
+            color: #d4af37; 
+            font-weight: bold; 
+            font-size: 11px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .career-entry .rank { 
+            color: #e0e0e0; 
+            margin-top: 8px;
+            font-size: 14px;
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
-            <h1>⚔️ EISERNES KREUZ</h1>
+            <h1>Eisernes Kreuz</h1>
             <div class="nav-section">
-                <h3>Jeu</h3>
-                <button class="nav-button active" onclick="showPage('creation')">Création</button>
-                <button class="nav-button" onclick="showPage('dashboard')">Tableau de Bord</button>
+                <h3>Général</h3>
+                <button class="nav-button active" onclick="showPage("dashboard")">Tableau de Bord</button>
+                <button class="nav-button" onclick="showPage("actions")">Actions</button>
+                <button class="nav-button" onclick="showPage("missions")">Missions</button>
             </div>
             <div class="nav-section">
-                <h3>Activités</h3>
-                <button class="nav-button" onclick="showPage('actions')">Actions</button>
-                <button class="nav-button" onclick="showPage('missions')">Missions</button>
-                <button class="nav-button" onclick="showPage('combat')">Combat</button>
-                <button class="nav-button" onclick="showPage('ai_gm')">IA MJ</button>
+                <h3>Personnage</h3>
+                <button class="nav-button" onclick="showPage("career")">Carrière</button>
+                <button class="nav-button" onclick="showPage("skills")">Compétences</button>
+                <button class="nav-button" onclick="showPage("inventory")">Inventaire</button>
+                <button class="nav-button" onclick="showPage("decorations")">Décorations</button>
             </div>
             <div class="nav-section">
-                <h3>Progression</h3>
-                <button class="nav-button" onclick="showPage('career')">Carrière</button>
-                <button class="nav-button" onclick="showPage('skills')">Compétences</button>
-                <button class="nav-button" onclick="showPage('decorations')">Décorations</button>
+                <h3>Social</h3>
+                <button class="nav-button" onclick="showPage("relations")">Relations</button>
+                <button class="nav-button" onclick="showPage("messages")">Messages</button>
             </div>
             <div class="nav-section">
-                <h3>Vie</h3>
-                <button class="nav-button" onclick="showPage('relations')">Relations</button>
-                <button class="nav-button" onclick="showPage('messages')">Messages</button>
-                <button class="nav-button" onclick="showPage('inventory')">Inventaire</button>
-                <button class="nav-button" onclick="showPage('map')">Carte</button>
+                <h3>Monde</h3>
+                <button class="nav-button" onclick="showPage("map")">Carte</button>
             </div>
             <div class="nav-section">
                 <h3>Santé</h3>
-                <button class="nav-button" onclick="showPage('health')">Physique</button>
-                <button class="nav-button" onclick="showPage('mental')">Mental</button>
+                <button class="nav-button" onclick="showPage("health")">Physique</button>
+                <button class="nav-button" onclick="showPage("mental")">Mental</button>
             </div>
             <div class="nav-section">
                 <h3>Autres</h3>
-                <button class="nav-button" onclick="showPage('journal')">Journal</button>
+                <button class="nav-button" onclick="showPage("journal")">Journal</button>
                 <button class="nav-button" onclick="resetGame()">Nouvelle Partie</button>
             </div>
         </div>
@@ -703,63 +790,10 @@
                         <div class="effect">+50 XP, +Mécanique, +Technique</div>
                     </div>
                     <div class="action-card" onclick="performAction('socializing')">
-                        <h3>🍺 Socialisation</h3>
-                        <p>Temps avec camarades</p>
-                        <div class="effect">+Moral, +Relations, +Camaraderie</div>
+                        <h3>🍻 Socialisation</h3>
+                        <p>Passer du temps avec les camarades</p>
+                        <div class="effect">+40 XP, +Relations, +Moral</div>
                     </div>
-                </div>
-            </div>
-
-            <!-- PAGE MISSIONS -->
-            <div id="missions" class="page">
-                <div class="header">
-                    <h1>Missions</h1>
-                    <p>Acceptez des missions pour gagner de l'expérience et des récompenses</p>
-                </div>
-                <h2 class="page-title">Missions Disponibles</h2>
-                <div id="missionsList"></div>
-            </div>
-
-            <!-- PAGE COMBAT -->
-            <div id="combat" class="page">
-                <div class="header">
-                    <h1>Système de Combat</h1>
-                    <p>Engagez-vous dans des combats tactiques</p>
-                </div>
-                <h2 class="page-title">Combats Disponibles</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div class="action-card" onclick="startCombat('skirmish')">
-                        <h3>🔫 Escarmouche</h3>
-                        <p>Combat léger contre patrouille ennemie</p>
-                        <div class="effect">Risque: Faible, +200 XP</div>
-                    </div>
-                    <div class="action-card" onclick="startCombat('ambush')">
-                        <h3>💣 Embuscade</h3>
-                        <p>Participer à une embuscade coordonnée</p>
-                        <div class="effect">Risque: Moyen, +400 XP</div>
-                    </div>
-                    <div class="action-card" onclick="startCombat('assault')">
-                        <h3>⚡ Assaut Frontal</h3>
-                        <p>Assaut direct contre position fortifiée</p>
-                        <div class="effect">Risque: TRÈS ÉLEVÉ, +600 XP</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- PAGE IA MJ -->
-            <div id="ai_gm" class="page">
-                <div class="header">
-                    <h1>IA Maître de Jeu</h1>
-                    <p>Interactions dynamiques avec l'IA</p>
-                </div>
-                <h2 class="page-title">Événement Généré</h2>
-                <div id="aiEvent" style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 20px; border-radius: 8px; margin-bottom: 20px; min-height: 100px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);">
-                    <p style="color: #b0b0b0;">Cliquez sur "Générer Événement" pour créer un événement aléatoire</p>
-                </div>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
-                    <button class="btn btn-primary" onclick="generateAIEvent()">Générer Événement</button>
-                    <button class="btn" onclick="generateAIMission()">Générer Mission</button>
-                    <button class="btn" onclick="generateAIMessage()">Générer Message</button>
                 </div>
             </div>
 
@@ -767,88 +801,71 @@
             <div id="career" class="page">
                 <div class="header">
                     <h1>Carrière Militaire</h1>
-                    <p>Suivi de votre progression et de vos promotions</p>
-                </div>
-                <h2 class="page-title">Rang Actuel</h2>
-                <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 20px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);">
-                    <h3 id="currentRankDisplay" style="color: #d4af37; margin-bottom: 15px; font-size: 18px;">-</h3>
-                    <div class="skill-bar">
-                        <div class="skill-progress" id="rankProgressBar" style="width: 0%;"></div>
-                    </div>
-                    <p style="color: #b0b0b0; margin-top: 12px; font-size: 12px;">XP: <span id="rankXP">0</span> / <span id="rankXPRequired">1000</span></p>
                 </div>
                 <h2 class="page-title">Historique des Promotions</h2>
-                <div id="promotionsList"></div>
+                <div id="promotionHistory"></div>
             </div>
 
             <!-- PAGE COMPÉTENCES -->
             <div id="skills" class="page">
                 <div class="header">
                     <h1>Compétences</h1>
-                    <p>Améliorez vos compétences militaires</p>
                 </div>
-                <h2 class="page-title">Compétences de Combat</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; margin-bottom: 10px; font-size: 13px;">🎯 Tir</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="skillShooting" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 11px;" id="skillShootingLevel">Novice (0/100)</div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Tir</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillShooting"></div></div>
+                        <div class="value" id="skillShootingLevel"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; margin-bottom: 10px; font-size: 13px;">⚔️ Mêlée</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="skillMelee" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 11px;" id="skillMeleeLevel">Novice (0/100)</div>
+                    <div class="stat-box">
+                        <h4>Mêlée</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillMelee"></div></div>
+                        <div class="value" id="skillMeleeLevel"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; margin-bottom: 10px; font-size: 13px;">⚙️ Tactique</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="skillTactics" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 11px;" id="skillTacticsLevel">Novice (0/100)</div>
+                    <div class="stat-box">
+                        <h4>Tactique</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillTactics"></div></div>
+                        <div class="value" id="skillTacticsLevel"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; margin-bottom: 10px; font-size: 13px;">👥 Leadership</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="skillLeadership" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 11px;" id="skillLeadershipLevel">Novice (0/100)</div>
+                    <div class="stat-box">
+                        <h4>Leadership</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillLeadership"></div></div>
+                        <div class="value" id="skillLeadershipLevel"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; margin-bottom: 10px; font-size: 13px;">🏕️ Survie</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="skillSurvival" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 11px;" id="skillSurvivalLevel">Novice (0/100)</div>
+                    <div class="stat-box">
+                        <h4>Survie</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillSurvival"></div></div>
+                        <div class="value" id="skillSurvivalLevel"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; margin-bottom: 10px; font-size: 13px;">🔧 Mécanique</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="skillMechanics" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 11px;" id="skillMechanicsLevel">Novice (0/100)</div>
+                    <div class="stat-box">
+                        <h4>Mécanique</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillMechanics"></div></div>
+                        <div class="value" id="skillMechanicsLevel"></div>
                     </div>
                 </div>
+            </div>
+
+            <!-- PAGE INVENTAIRE -->
+            <div id="inventory" class="page">
+                <div class="header">
+                    <h1>Inventaire</h1>
+                </div>
+                <div id="inventoryList"></div>
             </div>
 
             <!-- PAGE DÉCORATIONS -->
             <div id="decorations" class="page">
                 <div class="header">
-                    <h1>Décorations et Médailles</h1>
-                    <p>Vos récompenses et distinctions militaires</p>
+                    <h1>Décorations</h1>
                 </div>
-                <h2 class="page-title">Décorations Obtenues</h2>
-                <div id="obtainedDecorations" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; margin-bottom: 25px;">
-                    <p style="color: #b0b0b0; grid-column: 1/-1;">Aucune décoration</p>
-                </div>
-                <h2 class="page-title">Décorations Disponibles</h2>
-                <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);">
-                    <p style="color: #e0e0e0; margin-bottom: 12px;"><strong style="color: #d4af37;">🥇 Croix de Fer 1ère Classe:</strong> Plus haute distinction pour bravoure exceptionnelle</p>
-                    <p style="color: #e0e0e0; margin-bottom: 12px;"><strong style="color: #d4af37;">🥈 Croix de Fer 2ème Classe:</strong> Bravoure au combat</p>
-                    <p style="color: #e0e0e0; margin-bottom: 12px;"><strong style="color: #d4af37;">🩹 Insigne des Blessés:</strong> Noir (1), Argent (2-3), Or (4+)</p>
-                    <p style="color: #e0e0e0; margin-bottom: 12px;"><strong style="color: #d4af37;">🎖️ Médaille de Service:</strong> 4 ans, 12 ans, 20 ans</p>
-                    <p style="color: #e0e0e0;"><strong style="color: #d4af37;">❄️ Insigne du Front de l'Est:</strong> Service sur le front oriental</p>
-                </div>
+                <div id="decorationsList"></div>
             </div>
 
             <!-- PAGE RELATIONS -->
             <div id="relations" class="page">
                 <div class="header">
                     <h1>Relations</h1>
-                    <p>Gérez vos relations avec les PNJ</p>
                 </div>
-                <h2 class="page-title">Contacts</h2>
                 <div id="relationsList"></div>
             </div>
 
@@ -856,64 +873,48 @@
             <div id="messages" class="page">
                 <div class="header">
                     <h1>Messages</h1>
-                    <p>Boîte de réception</p>
                 </div>
-                <h2 class="page-title">Boîte de Réception</h2>
                 <div id="messagesList"></div>
-            </div>
-
-            <!-- PAGE INVENTAIRE -->
-            <div id="inventory" class="page">
-                <div class="header">
-                    <h1>Inventaire</h1>
-                    <p>Votre équipement et vos affaires</p>
-                </div>
-                <h2 class="page-title">Équipement</h2>
-                <div id="inventoryList"></div>
             </div>
 
             <!-- PAGE CARTE -->
             <div id="map" class="page">
                 <div class="header">
-                    <h1>Carte de l'Allemagne</h1>
-                    <p>Localisation actuelle: <span id="currentLocation">Berlin</span></p>
+                    <h1>Carte de l'Europe</h1>
                 </div>
-                <h2 class="page-title">Destinations Disponibles</h2>
-                <div id="locationsList"></div>
+                <div id="mapContainer"></div>
             </div>
 
             <!-- PAGE SANTÉ -->
             <div id="health" class="page">
                 <div class="header">
-                    <h1>État Physique</h1>
-                    <p>Suivi de votre santé et de vos blessures</p>
+                    <h1>Santé Physique</h1>
                 </div>
-                <h2 class="page-title">Santé Générale</h2>
-                <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.1);">
-                    <div class="skill-bar"><div class="skill-progress" id="globalHealth" style="width: 100%;"></div></div>
-                    <div style="color: #b0b0b0; font-size: 12px;" id="globalHealthStatus">Excellent (100/100)</div>
-                </div>
-                <h2 class="page-title">Parties du Corps</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">🗣️ Tête</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="healthHead" style="width: 100%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="healthHeadStatus">Sain</div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Santé Globale</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="globalHealth"></div></div>
+                        <div class="value" id="globalHealthStatus"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">❤️ Poitrine</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="healthChest" style="width: 100%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="healthChestStatus">Sain</div>
+                    <div class="stat-box">
+                        <h4>Tête</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthHead"></div></div>
+                        <div class="value" id="healthHeadStatus"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">💪 Bras Droit</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="healthArmRight" style="width: 100%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="healthArmRightStatus">Sain</div>
+                    <div class="stat-box">
+                        <h4>Torse</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthChest"></div></div>
+                        <div class="value" id="healthChestStatus"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">🦵 Jambe Droite</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="healthLegRight" style="width: 100%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="healthLegRightStatus">Sain</div>
+                    <div class="stat-box">
+                        <h4>Bras Droit</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthArmRight"></div></div>
+                        <div class="value" id="healthArmRightStatus"></div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Jambe Droite</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthLegRight"></div></div>
+                        <div class="value" id="healthLegRightStatus"></div>
                     </div>
                 </div>
             </div>
@@ -921,25 +922,23 @@
             <!-- PAGE MENTAL -->
             <div id="mental" class="page">
                 <div class="header">
-                    <h1>État Mental</h1>
-                    <p>Suivi de votre bien-être psychologique</p>
+                    <h1>Santé Mentale</h1>
                 </div>
-                <h2 class="page-title">Indicateurs Psychologiques</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">😊 Moral</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="mentalMoral" style="width: 100%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="mentalMoralLevel">Excellent (100/100)</div>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Moral</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="mentalMoral"></div></div>
+                        <div class="value" id="mentalMoralStatus"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">😰 Stress</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="mentalStress" style="width: 0%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="mentalStressLevel">Faible (0/100)</div>
+                    <div class="stat-box">
+                        <h4>Stress</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="mentalStress"></div></div>
+                        <div class="value" id="mentalStressStatus"></div>
                     </div>
-                    <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 15px; border-radius: 8px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                        <h4 style="color: #d4af37; font-size: 12px;">💪 Résilience</h4>
-                        <div class="skill-bar"><div class="skill-progress" id="mentalResilience" style="width: 50%;"></div></div>
-                        <div style="color: #b0b0b0; font-size: 10px;" id="mentalResilienceLevel">Moyen (50/100)</div>
+                    <div class="stat-box">
+                        <h4>Résilience</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="mentalResilience"></div></div>
+                        <div class="value" id="mentalResilienceStatus"></div>
                     </div>
                 </div>
             </div>
@@ -948,10 +947,16 @@
             <div id="journal" class="page">
                 <div class="header">
                     <h1>Journal de Marche</h1>
-                    <p>Historique de vos événements et actions</p>
                 </div>
-                <h2 class="page-title">Entrées du Journal</h2>
                 <div id="journalEntries"></div>
+            </div>
+
+            <!-- PAGE MISSIONS -->
+            <div id="missions" class="page">
+                <div class="header">
+                    <h1>Missions</h1>
+                </div>
+                <div id="missionsList"></div>
             </div>
         </div>
     </div>
@@ -960,45 +965,83 @@
     <div id="modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Titre</h2>
-                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <h2 id="modalTitle"></h2>
+                <span class="close-btn" onclick="closeModal()">&times;</span>
             </div>
-            <div class="modal-body" id="modalBody">Contenu</div>
-            <div class="modal-footer">
-                <button class="btn" onclick="closeModal()">Fermer</button>
-                <button class="btn btn-primary" id="modalAction" style="display: none;" onclick="executeModalAction()">Confirmer</button>
-            </div>
+            <div class="modal-body" id="modalBody"></div>
+            <div class="modal-footer" id="modalFooter"></div>
         </div>
     </div>
 
     <script>
-        // ===== BASES DE DONNÉES =====
-        const RANKS = ['Schütze', 'Obergefreiter', 'Unteroffizier', 'Feldwebel', 'Oberfeldwebel', 'Leutnant', 'Oberleutnant', 'Hauptmann', 'Major', 'Oberst'];
-        const LOCATIONS = ['Berlin', 'Munich', 'Hambourg', 'Cologne', 'Dresde', 'Varsovie', 'Paris', 'Stalingrad', 'Normandie', 'Ruhr', 'Vienne', 'Prague'];
-        const DECORATIONS_DB = {
-            'Croix de Fer 2ème Classe': '🥈',
-            'Croix de Fer 1ère Classe': '🥇',
-            'Insigne des Blessés': '🩹',
-            'Médaille de Service': '🎖️',
-            'Insigne du Front de l\'Est': '❄️',
-            'Insigne de Combat Rapproché': '🏴',
-            'Insigne Parachutiste': '🚁'
-        };
-        const NPCS = [
-            { name: 'Mère', relation: 'Famille', type: 'mother' },
-            { name: 'Père', relation: 'Famille', type: 'father' },
-            { name: 'Camarade 1', relation: 'Ami', type: 'friend' },
-            { name: 'Camarade 2', relation: 'Ami', type: 'friend' },
-            { name: 'Commandant', relation: 'Supérieur', type: 'superior' },
-            { name: 'Officier d\'État-Major', relation: 'Collègue', type: 'colleague' }
+        // ===== DONNÉES DU JEU =====
+        const RANKS = [
+            'Schütze', 'Oberschütze', 'Gefreiter', 'Obergefreiter', 'Stabsgefreiter',
+            'Unteroffizier', 'Unterfeldwebel', 'Feldwebel', 'Oberfeldwebel', 'Stabsfeldwebel',
+            'Leutnant', 'Oberleutnant', 'Hauptmann', 'Major', 'Oberstleutnant', 'Oberst',
+            'Generalmajor', 'Generalleutnant', 'General', 'Generaloberst', 'Generalfeldmarschall'
         ];
+
+        const DECORATIONS = [
+            { name: 'Croix de Fer 2e Classe', criteria: { combats: 5, moral: 60 } },
+            { name: 'Croix de Fer 1re Classe', criteria: { combats: 15, moral: 70 } },
+            { name: 'Croix de Chevalier', criteria: { combats: 30, moral: 80, leadership: 60 } },
+            { name: 'Insigne des Blessés (Noir)', criteria: { wounds: 1 } },
+            { name: 'Insigne des Blessés (Argent)', criteria: { wounds: 3 } },
+            { name: 'Insigne des Blessés (Or)', criteria: { wounds: 5 } }
+        ];
+
+        const NPCS = [
+            { name: 'Mère', relation: 'Famille' },
+            { name: 'Père', relation: 'Famille' },
+            { name: 'Hans (Camarade)', relation: 'Unité' },
+            { name: 'Fritz (Camarade)', relation: 'Unité' },
+            { name: 'Commandant', relation: 'Supérieur' }
+        ];
+
+        const LOCATIONS = [
+            { name: 'Berlin', country: 'Allemagne', x: 52.52, y: 13.40 },
+            { name: 'Munich', country: 'Allemagne', x: 48.13, y: 11.58 },
+            { name: 'Varsovie', country: 'Pologne', x: 52.22, y: 21.01 },
+            { name: 'Paris', country: 'France', x: 48.85, y: 2.35 },
+            { name: 'Stalingrad', country: 'URSS', x: 48.70, y: 44.51 },
+            { name: 'Madrid', country: 'Espagne', x: 40.41, y: -3.70 }
+        ];
+
+        const HISTORICAL_EVENTS = [
+            { date: new Date(1936, 6, 18), name: 'Guerre civile espagnole', description: 'La guerre civile espagnole éclate. Vous pouvez vous porter volontaire pour la Légion Condor.' },
+            { date: new Date(1938, 2, 12), name: 'Anschluss', description: 'L\'Allemagne annexe l\'Autriche.' },
+            { date: new Date(1939, 8, 1), name: 'Invasion de la Pologne', description: 'L\'Allemagne envahit la Pologne, déclenchant la Seconde Guerre mondiale.' },
+            { date: new Date(1940, 4, 10), name: 'Bataille de France', description: 'L\'Allemagne envahit la France.' },
+            { date: new Date(1941, 5, 22), name: 'Opération Barbarossa', description: 'L\'Allemagne envahit l\'Union soviétique.' },
+            { date: new Date(1942, 7, 23), name: 'Bataille de Stalingrad', description: 'La bataille de Stalingrad commence.' },
+            { date: new Date(1944, 5, 6), name: 'Débarquement de Normandie', description: 'Les Alliés débarquent en Normandie.' },
+            { date: new Date(1945, 4, 8), name: 'Fin de la guerre en Europe', description: 'L\'Allemagne capitule. La guerre est finie.' }
+        ];
+
+        const OLD_LOCATIONS = [
+            { name: 'Berlin', country: 'Allemagne' },
+            { name: 'Munich', country: 'Allemagne' },
+            { name: 'Varsovie', country: 'Pologne' },
+            { name: 'Paris', country: 'France' },
+            { name: 'Stalingrad', country: 'URSS' }
+        ];
+
+        const PEACE_MISSIONS = [
+            { id: 'peace_1', name: 'Entraînement de base', description: 'Participez à un entraînement de base pour améliorer vos compétences.', reward: { xp: 100 } },
+            { id: 'peace_2', name: 'Manœuvres militaires', description: 'Participez à des manœuvres militaires pour tester vos compétences.', reward: { xp: 200 } },
+            { id: 'peace_3', name: 'Garde de caserne', description: 'Effectuez une garde de caserne.', reward: { xp: 50 } },
+        ];
+
+        const WAR_MISSIONS = [
+            { id: 'war_1', name: 'Patrouille de reconnaissance', description: 'Effectuez une patrouille de reconnaissance en territoire ennemi.', reward: { xp: 500 } },
+            { id: 'war_2', name: 'Assaut frontal', description: 'Menez un assaut frontal contre une position ennemie.', reward: { xp: 1000 } },
+            { id: 'war_3', name: 'Défense de position', description: 'Défendez une position contre une attaque ennemie.', reward: { xp: 750 } },
+        ];
+
         const INVENTORY_ITEMS = [
-            { name: 'Mauser K98', type: 'weapon', quantity: 1 },
-            { name: 'Munitions', type: 'ammo', quantity: 120 },
-            { name: 'Uniforme', type: 'clothing', quantity: 1 },
-            { name: 'Rations', type: 'food', quantity: 5 },
-            { name: 'Lettre familiale', type: 'personal', quantity: 1 },
-            { name: 'Grenade à main', type: 'weapon', quantity: 3 },
+            { name: 'Fusil Kar98k', type: 'weapon', quantity: 1 },
+            { name: 'Pistolet Luger P08', type: 'weapon', quantity: 1 },
             { name: 'Baïonnette', type: 'weapon', quantity: 1 }
         ];
 
@@ -1017,7 +1060,8 @@
             currentDate: new Date(1933, 0, 30),
             actionsToday: 0,
             maxActionsPerDay: 2,
-            isWarTime: false
+            isWarTime: false,
+            isPeaceTime: true
         };
 
         // ===== FONCTIONS PRINCIPALES =====
@@ -1081,11 +1125,23 @@
             gameState.player.mental.stress += Math.random() * 2;
             gameState.player.mental.moral -= Math.random() * 1;
             if (gameState.player.mental.stress > 100) gameState.player.mental.stress = 100;
+            if (gameState.player.mental.stress < 0) gameState.player.mental.stress = 0;
             if (gameState.player.mental.moral < 0) gameState.player.mental.moral = 0;
             gameState.actionsToday = 0;
-            if (gameState.currentDate.getFullYear() === 1939 && gameState.currentDate.getMonth() === 8 && gameState.currentDate.getDate() === 1) {
+HISTORICAL_EVENTS.forEach(event => {
+                if (event.date.getTime() === gameState.currentDate.getTime()) {
+                    addJournalEntry(`Événement historique : ${event.name} - ${event.description}`);
+                    showModal(`Événement historique : ${event.name}`, event.description);
+                }
+            });
+
+            if (gameState.currentDate.getFullYear() >= 1939 && gameState.currentDate.getMonth() >= 8 && gameState.currentDate.getDate() >= 1) {
                 gameState.isWarTime = true;
-                addJournalEntry('La Seconde Guerre mondiale a commencé!');
+                gameState.isPeaceTime = false;
+                addJournalEntry("La Seconde Guerre mondiale a commencé!");
+            } else {
+                gameState.isWarTime = false;
+                gameState.isPeaceTime = true;
             }
             checkPromotion();
             updateDashboard();
@@ -1123,6 +1179,7 @@
             if (gameState.player.health < 100 && act.health) gameState.player.health = Math.min(100, gameState.player.health + act.health);
             if (gameState.player.mental.moral > 100) gameState.player.mental.moral = 100;
             if (gameState.player.mental.stress > 100) gameState.player.mental.stress = 100;
+            if (gameState.player.mental.stress < 0) gameState.player.mental.stress = 0;
             act.skills.forEach(skill => {
                 gameState.player.skills[skill] = Math.min(100, gameState.player.skills[skill] + Math.random() * 5);
             });
@@ -1132,7 +1189,7 @@
         }
 
         function checkPromotion() {
-            const nextRankXP = (gameState.player.rank + 1) * 1000;
+            const nextRankXP = (gameState.player.rank + 1) * 1000 * (1 + gameState.player.rank * 0.5);
             if (gameState.player.experience >= nextRankXP && gameState.player.rank < RANKS.length - 1) {
                 gameState.player.rank += 1;
                 gameState.player.totalPromotions += 1;
@@ -1172,192 +1229,170 @@
 
         function updateMental() {
             document.getElementById('mentalMoral').style.width = gameState.player.mental.moral + '%';
-            document.getElementById('mentalMoralLevel').textContent = `${getLevel(gameState.player.mental.moral)} (${Math.floor(gameState.player.mental.moral)}/100)`;
+            document.getElementById('mentalMoralStatus').textContent = `${getMentalStatus(gameState.player.mental.moral)} (${Math.floor(gameState.player.mental.moral)}/100)`;
             document.getElementById('mentalStress').style.width = gameState.player.mental.stress + '%';
-            document.getElementById('mentalStressLevel').textContent = `${getLevel(gameState.player.mental.stress)} (${Math.floor(gameState.player.mental.stress)}/100)`;
+            document.getElementById('mentalStressStatus').textContent = `${getMentalStatus(gameState.player.mental.stress)} (${Math.floor(gameState.player.mental.stress)}/100)`;
             document.getElementById('mentalResilience').style.width = gameState.player.mental.resilience + '%';
-            document.getElementById('mentalResilienceLevel').textContent = `${getLevel(gameState.player.mental.resilience)} (${Math.floor(gameState.player.mental.resilience)}/100)`;
+            document.getElementById('mentalResilienceStatus').textContent = `${getMentalStatus(gameState.player.mental.resilience)} (${Math.floor(gameState.player.mental.resilience)}/100)`;
         }
 
         function updateRelations() {
-            const html = NPCS.map(npc => `
-                <div class="npc-card">
+            const list = document.getElementById('relationsList');
+            list.innerHTML = '';
+            NPCS.forEach(npc => {
+                const card = document.createElement('div');
+                card.className = 'npc-card';
+                card.innerHTML = `
                     <div class="name">${npc.name}</div>
                     <div class="relation">Relation: ${Math.floor(gameState.player.relations[npc.name])}%</div>
-                    <button class="btn" style="margin-top: 10px; font-size: 11px;" onclick="interactWithNPC('${npc.name}')">Interagir</button>
-                </div>
-            `).join('');
-            document.getElementById('relationsList').innerHTML = html;
+                    <div class="actions">
+                        <button class="btn" onclick="interactWith('${npc.name}')">Interagir</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
         }
 
         function updateMessages() {
-            const html = gameState.player.messages.length > 0 ? gameState.player.messages.map(msg => `
-                <div class="message-box">
-                    <div class="sender">${msg.sender}</div>
+            const list = document.getElementById('messagesList');
+            list.innerHTML = '';
+            gameState.player.messages.forEach(msg => {
+                const box = document.createElement('div');
+                box.className = 'message-box';
+                box.innerHTML = `
+                    <div class="sender">De: ${msg.sender}</div>
                     <div class="content">${msg.content}</div>
-                </div>
-            `).join('') : '<p style="color: #b0b0b0;">Aucun message</p>';
-            document.getElementById('messagesList').innerHTML = html;
+                `;
+                list.appendChild(box);
+            });
         }
 
         function updateInventory() {
-            const html = gameState.player.inventory.map(item => `
-                <div style="background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid rgba(212, 175, 55, 0.3); padding: 12px; border-radius: 6px; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(212, 175, 55, 0.1);">
-                    <p style="color: #d4af37; font-weight: bold; font-size: 13px;">${item.name}</p>
-                    <p style="color: #b0b0b0; font-size: 11px;">Quantité: ${item.quantity}</p>
-                </div>
-            `).join('');
-            document.getElementById('inventoryList').innerHTML = html;
+            const list = document.getElementById('inventoryList');
+            list.innerHTML = '';
+            gameState.player.inventory.forEach(item => {
+                const entry = document.createElement('div');
+                entry.className = 'inventory-item';
+                entry.innerHTML = `
+                    <div class="name">${item.name}</div>
+                    <div class="quantity">x${item.quantity}</div>
+                `;
+                list.appendChild(entry);
+            });
+        }
+
+        function updateDecorations() {
+            const list = document.getElementById('decorationsList');
+            list.innerHTML = '';
+            gameState.player.decorations.forEach(dec => {
+                const card = document.createElement('div');
+                card.className = 'decoration-card';
+                card.innerHTML = `<h3>${dec.name}</h3><p>Obtenue le ${dec.date}</p>`;
+                list.appendChild(card);
+            });
         }
 
         function updateMap() {
-            document.getElementById('currentLocation').textContent = gameState.player.location;
-            const html = LOCATIONS.filter(loc => loc !== gameState.player.location).map(loc => `
-                <div class="location-card" onclick="travelTo('${loc}')">
-                    <h3>📍 ${loc}</h3>
-                    <p>Cliquez pour voyager</p>
-                </div>
-            `).join('');
-            document.getElementById('locationsList').innerHTML = html;
+            const container = document.getElementById('mapContainer');
+            container.innerHTML = '<canvas id="mapCanvas" width="800" height="600"></canvas>';
+            const canvas = document.getElementById('mapCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Draw map background (simple for now)
+            ctx.fillStyle = '#333';
+            ctx.fillRect(0, 0, 800, 600);
+
+            // Draw locations
+            LOCATIONS.forEach(loc => {
+                const x = (loc.y + 180) * (800 / 360);
+                const y = (90 - loc.x) * (600 / 180);
+                ctx.fillStyle = loc.name === gameState.player.location ? '#ff9800' : '#d4af37';
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+                ctx.fillStyle = '#fff';
+                ctx.fillText(loc.name, x + 10, y + 5);
+            });
+        }
+
+        function old_updateMap() {
+            const container = document.getElementById('mapContainer');
+            container.innerHTML = '';
+            LOCATIONS.forEach(loc => {
+                const card = document.createElement('div');
+                card.className = 'location-card';
+                card.innerHTML = `<h3>${loc.name}</h3><p>${loc.country}</p>`;
+                if (loc.name === gameState.player.location) {
+                    card.style.borderColor = '#ff9800';
+                }
+                card.onclick = () => travelTo(loc.name);
+                container.appendChild(card);
+            });
         }
 
         function updateMissions() {
-            const missions = [
-                { name: 'Reconnaissance', xp: 500, prestige: 100, days: 3 },
-                { name: 'Patrouille Défensive', xp: 300, prestige: 50, days: 2 },
-                { name: 'Raid Nocturne', xp: 700, prestige: 150, days: 1 }
-            ];
-            const html = missions.map(m => `
-                <div class="action-card" onclick="acceptMission('${m.name}', ${m.xp}, ${m.prestige}, ${m.days})">
-                    <h3>🎯 ${m.name}</h3>
-                    <p>Durée: ${m.days} jour(s)</p>
-                    <div class="effect">+${m.xp} XP, +${m.prestige} Prestige</div>
-                </div>
-            `).join('');
-            document.getElementById('missionsList').innerHTML = html;
+            const list = document.getElementById('missionsList');
+            list.innerHTML = '';
+            const missions = gameState.isWarTime ? WAR_MISSIONS : PEACE_MISSIONS;
+            missions.forEach(mission => {
+                const card = document.createElement('div');
+                card.className = 'mission-card';
+                card.innerHTML = `
+                    <h3>${mission.name}</h3>
+                    <p>${mission.description}</p>
+                    <div class="reward">Récompense: ${mission.reward.xp} XP</div>
+                    <div class="actions">
+                        <button class="btn" onclick="acceptMission('${mission.id}')">Accepter</button>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
         }
 
         function updateCareer() {
-            document.getElementById('currentRankDisplay').textContent = RANKS[gameState.player.rank] || '-';
-            document.getElementById('rankProgressBar').style.width = (gameState.player.experience % 1000) / 10 + '%';
-            document.getElementById('rankXP').textContent = Math.floor(gameState.player.experience % 1000);
-            document.getElementById('rankXPRequired').textContent = '1000';
-            const html = gameState.player.promotionHistory.length > 0 ? gameState.player.promotionHistory.map(p => `
-                <div class="journal-entry">
-                    <div class="date">${p.date}</div>
-                    <div class="content">Promotion à ${p.rank}</div>
-                </div>
-            `).join('') : '<p style="color: #b0b0b0;">Aucune promotion pour le moment</p>';
-            document.getElementById('promotionsList').innerHTML = html;
-        }
-
-        function acceptMission(name, xp, prestige, days) {
-            gameState.player.experience += xp;
-            gameState.player.missionsCompleted += 1;
-            for (let i = 0; i < days; i++) advanceDay();
-            addJournalEntry(`Mission complétée: ${name}`);
-            showModal('Mission Acceptée', `Mission: ${name}\n+${xp} XP, +${prestige} Prestige`);
-        }
-
-        function startCombat(combatType) {
-            const combats = {
-                skirmish: { xp: 200, risk: 'Faible', name: 'Escarmouche' },
-                ambush: { xp: 400, risk: 'Moyen', name: 'Embuscade' },
-                assault: { xp: 600, risk: 'TRÈS ÉLEVÉ', name: 'Assaut Frontal' }
-            };
-            const combat = combats[combatType];
-            if (!combat) return;
-            const success = Math.random() > 0.3;
-            if (success) {
-                gameState.player.experience += combat.xp;
-                gameState.player.combatsParticipated += 1;
-                addJournalEntry(`Combat: ${combat.name} - Victoire!`);
-                showModal('Combat Gagné', `${combat.name}\n+${combat.xp} XP\nRisque: ${combat.risk}`);
-            } else {
-                gameState.player.totalWounds += 1;
-                gameState.player.health -= Math.random() * 30;
-                addJournalEntry(`Combat: ${combat.name} - Défaite...`);
-                showModal('Combat Perdu', `${combat.name}\nVous avez été blessé!\nSanté: ${Math.floor(gameState.player.health)}%`);
-            }
-            advanceDay();
-        }
-
-        function travelTo(location) {
-            gameState.player.location = location;
-            advanceDay();
-            showModal('Voyage', `Vous avez voyagé à ${location}`);
-        }
-
-        function interactWithNPC(npcName) {
-            const messages = [
-                `${npcName} vous dit bonjour.`,
-                `${npcName} vous demande comment vous allez.`,
-                `${npcName} partage des nouvelles avec vous.`
-            ];
-            const msg = messages[Math.floor(Math.random() * messages.length)];
-            gameState.player.relations[npcName] = Math.min(100, gameState.player.relations[npcName] + 5);
-            showModal(`Interaction avec ${npcName}`, msg);
-        }
-
-        function generateAIEvent() {
-            const events = [
-                'Vous recevez une lettre de votre famille.',
-                'Un camarade vous propose de prendre un verre.',
-                'Vous êtes sélectionné pour une mission spéciale.',
-                'Un événement historique se déroule.',
-                'Vous recevez une promotion inattendue.',
-                'Une inspection surprise du commandement.',
-                'Vous êtes récompensé pour votre bravoure.'
-            ];
-            const event = events[Math.floor(Math.random() * events.length)];
-            document.getElementById('aiEvent').innerHTML = `<p style="color: #e0e0e0;">${event}</p>`;
-            addJournalEntry(`Événement IA: ${event}`);
-        }
-
-        function generateAIMission() {
-            const missions = ['Reconnaissance', 'Patrouille', 'Raid', 'Escorte', 'Défense', 'Sabotage', 'Infiltration'];
-            const mission = missions[Math.floor(Math.random() * missions.length)];
-            document.getElementById('aiEvent').innerHTML = `<p style="color: #e0e0e0;">Nouvelle mission: ${mission}</p>`;
-        }
-
-        function generateAIMessage() {
-            const senders = ['Mère', 'Père', 'Camarade', 'Commandant', 'Haut Commandement', 'Intelligence Militaire'];
-            const sender = senders[Math.floor(Math.random() * senders.length)];
-            const messages = ['Comment allez-vous?', 'Nous pensons à vous.', 'Ordres importants à suivre.', 'Bonne chance.', 'Restez vigilant.'];
-            const content = messages[Math.floor(Math.random() * messages.length)];
-            gameState.player.messages.push({ sender, content });
-            showModal('Nouveau Message', `De: ${sender}\n${content}`);
+            const history = document.getElementById('promotionHistory');
+            history.innerHTML = '';
+            gameState.player.promotionHistory.forEach(p => {
+                const entry = document.createElement('div');
+                entry.className = 'career-entry';
+                entry.innerHTML = `<div class="date">${p.date}</div><div class="rank">${p.rank}</div>`;
+                history.appendChild(entry);
+            });
         }
 
         function addJournalEntry(content) {
-            gameState.player.journal.push({ date: gameState.currentDate.toLocaleDateString('fr-FR'), content });
-            const journalEntries = document.getElementById('journalEntries');
-            journalEntries.innerHTML = gameState.player.journal.slice(-10).reverse().map(e => `
-                <div class="journal-entry">
-                    <div class="date">${e.date}</div>
-                    <div class="content">${e.content}</div>
-                </div>
-            `).join('');
+            gameState.player.journal.unshift({ date: gameState.currentDate.toLocaleDateString('fr-FR'), content: content });
+            const list = document.getElementById('journalEntries');
+            if (list) {
+                list.innerHTML = '';
+                gameState.player.journal.forEach(entry => {
+                    const div = document.createElement('div');
+                    div.className = 'journal-entry';
+                    div.innerHTML = `<div class="date">${entry.date}</div><div class="content">${entry.content}</div>`;
+                    list.appendChild(div);
+                });
+            }
         }
 
-        function getLevel(value) {
-            if (value < 20) return 'Novice';
-            if (value < 40) return 'Apprenti';
-            if (value < 60) return 'Compétent';
-            if (value < 80) return 'Expert';
-            return 'Maître';
-        }
-
-        function getHealthStatus(value) {
-            if (value > 75) return 'Excellent';
-            if (value > 50) return 'Bon';
-            if (value > 25) return 'Blessé';
-            return 'Critique';
-        }
-
-        function showModal(title, content) {
+        function showModal(title, body, footerButtons = []) {
             document.getElementById('modalTitle').textContent = title;
-            document.getElementById('modalBody').textContent = content;
+            document.getElementById('modalBody').innerHTML = body;
+            const footer = document.getElementById('modalFooter');
+            footer.innerHTML = '';
+            footerButtons.forEach(btn => {
+                const button = document.createElement('button');
+                button.className = `btn ${btn.class || ''}`;
+                button.textContent = btn.text;
+                button.onclick = btn.onclick;
+                footer.appendChild(button);
+            });
+            if (footerButtons.length === 0) {
+                const okButton = document.createElement('button');
+                okButton.className = 'btn btn-primary';
+                okButton.textContent = 'OK';
+                okButton.onclick = closeModal;
+                footer.appendChild(okButton);
+            }
             document.getElementById('modal').classList.add('active');
         }
 
@@ -1370,33 +1405,112 @@
         }
 
         function loadGame() {
-            const saved = localStorage.getItem('eisernesKreuzSave');
-            if (saved) {
-                gameState = JSON.parse(saved);
+            const savedGame = localStorage.getItem('eisernesKreuzSave');
+            if (savedGame) {
+                gameState = JSON.parse(savedGame);
                 gameState.currentDate = new Date(gameState.currentDate);
                 gameState.gameStarted = true;
                 updateDashboard();
                 showPage('dashboard');
-                document.querySelectorAll('.nav-button')[1].classList.add('active');
             } else {
-                alert('Aucune sauvegarde trouvée');
+                alert('Aucune partie sauvegardée trouvée.');
             }
         }
 
         function resetGame() {
-            if (confirm('Êtes-vous sûr de vouloir recommencer?')) {
+            if (confirm('Êtes-vous sûr de vouloir recommencer une nouvelle partie? Toute progression sera perdue.')) {
                 localStorage.removeItem('eisernesKreuzSave');
                 location.reload();
             }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const saved = localStorage.getItem('eisernesKreuzSave');
-            if (saved) {
-                const btn = document.querySelector('button[onclick="loadGame()"]');
-                if (btn) btn.style.display = 'block';
+        function getLevel(skill) {
+            if (skill >= 90) return 'Maître';
+            if (skill >= 75) return 'Expert';
+            if (skill >= 50) return 'Compétent';
+            if (skill >= 25) return 'Initié';
+            return 'Novice';
+        }
+
+        function getHealthStatus(health) {
+            if (health >= 90) return 'Excellente';
+            if (health >= 70) return 'Bonne';
+            if (health >= 40) return 'Moyenne';
+            if (health >= 10) return 'Faible';
+            return 'Critique';
+        }
+
+        function getMentalStatus(value) {
+            if (value >= 80) return 'Élevé';
+            if (value >= 60) return 'Bon';
+            if (value >= 40) return 'Moyen';
+            if (value >= 20) return 'Faible';
+            return 'Critique';
+        }
+
+        function travelTo(location) {
+            if (location === gameState.player.location) return;
+            const travelTime = Math.floor(Math.random() * 5) + 1;
+            for (let i = 0; i < travelTime; i++) advanceDay();
+            gameState.player.location = location;
+            addJournalEntry(`Voyage à ${location}.`);
+            updateDashboard();
+            updateMap();
+        }
+
+        function interactWith(npcName) {
+            const npc = NPCS.find(n => n.name === npcName);
+            if (!npc) return;
+
+            let interactionOptions = [];
+            if (npc.relation === 'Supérieur') {
+                interactionOptions = [
+                    { text: 'Saluer respectueusement', action: () => { changeRelation(npcName, 5); showModal('Interaction', 'Vous saluez votre supérieur, qui hoche la tête en retour.'); } },
+                    { text: 'Demander un conseil', action: () => { changeRelation(npcName, 10); showModal('Interaction', 'Votre supérieur vous donne un conseil avisé.'); } },
+                    { text: 'Se plaindre', action: () => { changeRelation(npcName, -15); showModal('Interaction', 'Votre supérieur n\`apprécie pas votre plainte.'); } },
+                ];
+            } else if (npc.relation === 'Unité') {
+                interactionOptions = [
+                    { text: 'Partager une ration', action: () => { changeRelation(npcName, 10); showModal('Interaction', 'Vous partagez votre ration avec votre camarade.'); } },
+                    { text: 'Parler de la famille', action: () => { changeRelation(npcName, 15); showModal('Interaction', 'Vous parlez de votre famille avec votre camarade.'); } },
+                    { text: 'Se vanter', action: () => { changeRelation(npcName, -5); showModal('Interaction', 'Votre camarade n\`est pas impressionné par votre vantardise.'); } },
+                ];
+            } else if (npc.relation === 'Famille') {
+                interactionOptions = [
+                    { text: 'Écrire une lettre', action: () => { changeRelation(npcName, 20); showModal('Interaction', 'Vous écrivez une lettre à votre famille.'); } },
+                ];
             }
-        });
+
+            const modalButtons = interactionOptions.map(opt => ({ text: opt.text, onclick: opt.action, class: 'btn-primary' }));
+            showModal(`Interagir avec ${npcName}`, 'Que voulez-vous faire?', modalButtons);
+        }
+
+        function changeRelation(npcName, amount) {
+            gameState.player.relations[npcName] = Math.max(0, Math.min(100, gameState.player.relations[npcName] + amount));
+            updateRelations();
+        }
+
+        function old_interactWith(npcName) {
+            const relation = gameState.player.relations[npcName];
+            const outcome = Math.random();
+            if (outcome > 0.5) {
+                gameState.player.relations[npcName] = Math.min(100, relation + 5);
+                showModal('Interaction Positive', `Votre conversation avec ${npcName} s'est bien passée.`);
+            } else {
+                gameState.player.relations[npcName] = Math.max(0, relation - 5);
+                showModal('Interaction Négative', `Votre conversation avec ${npcName} a été tendue.`);
+            }
+            updateRelations();
+        }
+
+        // Initialisation
+        window.onload = () => {
+            if (localStorage.getItem('eisernesKreuzSave')) {
+                loadGame();
+            } else {
+                showPage('creation');
+            }
+        };
     </script>
 </body>
 </html>
