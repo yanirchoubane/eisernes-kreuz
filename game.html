@@ -1,1 +1,902 @@
-'''<!DOCTYPE html>... (le code complet de plusieurs milliers de lignes pour la version finale du jeu) ...'''
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eisernes Kreuz - Simulation Totale</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); color: #e0e0e0; line-height: 1.6; overflow-x: hidden; }
+        .container { display: flex; min-height: 100vh; }
+        .sidebar { width: 250px; background: linear-gradient(180deg, #0d0d0d 0%, #1a1a1a 100%); border-right: 3px solid #d4af37; padding: 20px; overflow-y: auto; position: fixed; left: 0; top: 0; height: 100vh; z-index: 1000; }
+        .sidebar h1 { color: #d4af37; font-size: 16px; margin-bottom: 25px; text-align: center; border-bottom: 2px solid #d4af37; padding-bottom: 15px; }
+        .nav-section { margin-bottom: 20px; }
+        .nav-section h3 { color: #d4af37; font-size: 11px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .nav-button { width: 100%; padding: 10px; margin-bottom: 6px; background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; color: #e0e0e0; cursor: pointer; border-radius: 4px; transition: all 0.3s; font-size: 12px; text-align: left; }
+        .nav-button:hover { background: rgba(212, 175, 55, 0.3); transform: translateX(3px); }
+        .nav-button.active { background: #d4af37; color: #0d0d0d; font-weight: bold; }
+        .main-content { margin-left: 250px; flex: 1; padding: 25px; overflow-y: auto; }
+        .header { background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid #d4af37; padding: 20px; margin-bottom: 25px; border-radius: 8px; }
+        .header h1 { color: #d4af37; font-size: 28px; margin-bottom: 10px; }
+        .player-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 15px; }
+        .info-box { background: rgba(212, 175, 55, 0.05); border-left: 3px solid #d4af37; padding: 12px; border-radius: 4px; }
+        .info-box label { color: #d4af37; font-weight: bold; font-size: 10px; text-transform: uppercase; display: block; margin-bottom: 5px; }
+        .info-box .value { color: #e0e0e0; font-size: 14px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .page-title { color: #d4af37; font-size: 24px; margin-bottom: 20px; border-bottom: 2px solid #d4af37; padding-bottom: 10px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; color: #d4af37; font-weight: bold; margin-bottom: 6px; font-size: 12px; }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; color: #e0e0e0; border-radius: 4px; font-family: inherit; font-size: 12px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; background: rgba(212, 175, 55, 0.15); box-shadow: 0 0 10px rgba(212, 175, 55, 0.3); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .btn { padding: 10px 20px; border: 2px solid #d4af37; background: rgba(212, 175, 55, 0.1); color: #d4af37; cursor: pointer; border-radius: 4px; font-weight: bold; transition: all 0.3s; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn:hover { background: #d4af37; color: #0d0d0d; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3); }
+        .btn-primary { background: #d4af37; color: #0d0d0d; border-color: #d4af37; }
+        .btn-primary:hover { background: #e0c158; border-color: #e0c158; }
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .action-card { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid #d4af37; padding: 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; }
+        .action-card:hover { background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(212, 175, 55, 0.2); }
+        .action-card h3 { color: #d4af37; margin-bottom: 8px; font-size: 14px; }
+        .action-card p { color: #b0b0b0; font-size: 11px; margin-bottom: 8px; }
+        .action-card .effect { color: #4caf50; font-size: 10px; font-weight: bold; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 25px; }
+        .stat-box { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid #d4af37; padding: 15px; border-radius: 8px; text-align: center; }
+        .stat-box h4 { color: #d4af37; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; }
+        .stat-box .value { color: #e0e0e0; font-size: 22px; font-weight: bold; }
+        .skill-bar { background: rgba(0, 0, 0, 0.5); border: 1px solid #d4af37; height: 20px; border-radius: 4px; overflow: hidden; margin-bottom: 8px; }
+        .skill-progress { height: 100%; background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: bold; font-size: 9px; }
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); }
+        .modal.active { display: flex; align-items: center; justify-content: center; }
+        .modal-content { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border: 3px solid #d4af37; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; max-height: 75vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #d4af37; padding-bottom: 12px; }
+        .modal-header h2 { color: #d4af37; font-size: 20px; }
+        .close-btn { background: none; border: none; color: #d4af37; font-size: 24px; cursor: pointer; transition: all 0.3s; }
+        .close-btn:hover { color: #e0c158; transform: scale(1.2); }
+        .modal-body { color: #e0e0e0; margin-bottom: 15px; line-height: 1.6; font-size: 12px; }
+        .modal-footer { display: flex; gap: 10px; justify-content: flex-end; }
+        .journal-entry { background: rgba(212, 175, 55, 0.05); border-left: 3px solid #d4af37; padding: 12px; margin-bottom: 12px; border-radius: 4px; }
+        .journal-entry .date { color: #d4af37; font-weight: bold; font-size: 10px; text-transform: uppercase; }
+        .journal-entry .content { color: #e0e0e0; margin-top: 6px; font-size: 11px; }
+        .action-counter { background: rgba(212, 175, 55, 0.1); border: 1px solid #d4af37; padding: 10px; border-radius: 4px; margin-bottom: 15px; color: #d4af37; font-weight: bold; text-align: center; }
+        .exp-bar { background: rgba(0, 0, 0, 0.5); border: 1px solid #d4af37; height: 25px; border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+        .exp-progress { height: 100%; background: linear-gradient(90deg, #ff9800 0%, #ffc107 100%); width: 0%; transition: width 0.3s; display: flex; align-items: center; justify-content: center; color: #000; font-weight: bold; font-size: 11px; }
+        .message-box { background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; margin-bottom: 12px; border-radius: 4px; border-left: 3px solid #ff9800; }
+        .message-box .sender { color: #ff9800; font-weight: bold; font-size: 11px; }
+        .message-box .content { color: #e0e0e0; margin-top: 6px; font-size: 11px; }
+        .location-card { background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, rgba(212, 175, 55, 0.05) 100%); border: 2px solid #d4af37; padding: 15px; border-radius: 8px; cursor: pointer; transition: all 0.3s; margin-bottom: 12px; }
+        .location-card:hover { background: linear-gradient(135deg, rgba(212, 175, 55, 0.2) 0%, rgba(212, 175, 55, 0.1) 100%); transform: translateX(5px); }
+        .location-card h3 { color: #d4af37; margin-bottom: 6px; font-size: 13px; }
+        .location-card p { color: #b0b0b0; font-size: 10px; }
+        .npc-card { background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px; margin-bottom: 10px; }
+        .npc-card .name { color: #d4af37; font-weight: bold; font-size: 12px; }
+        .npc-card .relation { color: #b0b0b0; font-size: 10px; margin-top: 4px; }
+        @media (max-width: 768px) { .sidebar { width: 180px; } .main-content { margin-left: 180px; padding: 15px; } .form-row { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <h1>⚔️ EISERNES KREUZ</h1>
+            <div class="nav-section">
+                <h3>Jeu</h3>
+                <button class="nav-button active" onclick="showPage('creation')">Création</button>
+                <button class="nav-button" onclick="showPage('dashboard')">Tableau de Bord</button>
+            </div>
+            <div class="nav-section">
+                <h3>Activités</h3>
+                <button class="nav-button" onclick="showPage('actions')">Actions</button>
+                <button class="nav-button" onclick="showPage('missions')">Missions</button>
+                <button class="nav-button" onclick="showPage('ai_gm')">IA MJ</button>
+            </div>
+            <div class="nav-section">
+                <h3>Progression</h3>
+                <button class="nav-button" onclick="showPage('career')">Carrière</button>
+                <button class="nav-button" onclick="showPage('skills')">Compétences</button>
+                <button class="nav-button" onclick="showPage('decorations')">Décorations</button>
+            </div>
+            <div class="nav-section">
+                <h3>Vie</h3>
+                <button class="nav-button" onclick="showPage('relations')">Relations</button>
+                <button class="nav-button" onclick="showPage('messages')">Messages</button>
+                <button class="nav-button" onclick="showPage('inventory')">Inventaire</button>
+                <button class="nav-button" onclick="showPage('map')">Carte</button>
+            </div>
+            <div class="nav-section">
+                <h3>Santé</h3>
+                <button class="nav-button" onclick="showPage('health')">Physique</button>
+                <button class="nav-button" onclick="showPage('mental')">Mental</button>
+            </div>
+            <div class="nav-section">
+                <h3>Autres</h3>
+                <button class="nav-button" onclick="showPage('journal')">Journal</button>
+                <button class="nav-button" onclick="resetGame()">Nouvelle Partie</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- PAGE CRÉATION -->
+            <div id="creation" class="page active">
+                <div class="header">
+                    <h1>Création de Personnage</h1>
+                    <p>Configurez votre officier pour commencer votre simulation (1933-1945)</p>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Nom Complet</label>
+                        <input type="text" id="playerName" placeholder="Ex: Klaus Weber" value="">
+                    </div>
+                    <div class="form-group">
+                        <label>Date de Naissance</label>
+                        <input type="date" id="birthDate" value="1915-01-01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Région d'Origine</label>
+                        <select id="region">
+                            <option value="prussie">Prusse</option>
+                            <option value="baviere">Bavière</option>
+                            <option value="saxe">Saxe</option>
+                            <option value="rheinland">Rhénanie</option>
+                            <option value="autriche">Autriche</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Parcours Éducatif</label>
+                        <select id="education">
+                            <option value="hitlerjugend">Jeunesses Hitlériennes</option>
+                            <option value="universite">Université</option>
+                            <option value="usine">Usine d'Armement</option>
+                            <option value="campagne">Campagne</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Branche Militaire</label>
+                        <select id="branch">
+                            <option value="heer">Heer (Armée de Terre)</option>
+                            <option value="luftwaffe">Luftwaffe (Aviation)</option>
+                            <option value="kriegsmarine">Kriegsmarine (Marine)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Spécialisation</label>
+                        <select id="specialization">
+                            <option value="infanterie">Infanterie</option>
+                            <option value="panzer">Panzer</option>
+                            <option value="artillerie">Artillerie</option>
+                            <option value="reconnaissance">Reconnaissance</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Notes Personnelles</label>
+                    <textarea id="notes" placeholder="Vos ambitions..." rows="4"></textarea>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="startGame()">Commencer</button>
+                    <button class="btn" onclick="loadGame()">Charger</button>
+                </div>
+            </div>
+
+            <!-- PAGE TABLEAU DE BORD -->
+            <div id="dashboard" class="page">
+                <div class="header">
+                    <h1 id="dashboardTitle">Tableau de Bord</h1>
+                    <div class="player-info">
+                        <div class="info-box">
+                            <label>Nom</label>
+                            <div class="value" id="dashboardName">-</div>
+                        </div>
+                        <div class="info-box">
+                            <label>Rang</label>
+                            <div class="value" id="dashboardRank">-</div>
+                        </div>
+                        <div class="info-box">
+                            <label>Branche</label>
+                            <div class="value" id="dashboardBranch">-</div>
+                        </div>
+                        <div class="info-box">
+                            <label>Date</label>
+                            <div class="value" id="dashboardDate">-</div>
+                        </div>
+                        <div class="info-box">
+                            <label>Santé</label>
+                            <div class="value" id="dashboardHealth">100%</div>
+                        </div>
+                        <div class="info-box">
+                            <label>Moral</label>
+                            <div class="value" id="dashboardMoral">100%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h2 class="page-title">Expérience et Progression</h2>
+                <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <p style="color: #d4af37; font-weight: bold; margin-bottom: 10px;">Expérience: <span id="currentXP">0</span> / <span id="nextRankXP">1000</span></p>
+                    <div class="exp-bar">
+                        <div class="exp-progress" id="expBar" style="width: 0%;"></div>
+                    </div>
+                    <p style="color: #b0b0b0; font-size: 11px;">Progression vers le prochain grade</p>
+                </div>
+
+                <h2 class="page-title">Actions Rapides</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px;">
+                    <button class="btn btn-primary" onclick="advanceDay()">Jour Suivant</button>
+                    <button class="btn btn-primary" onclick="advanceWeek()">Semaine</button>
+                    <button class="btn btn-primary" onclick="advanceMonth()">Mois</button>
+                    <button class="btn" onclick="saveGame()">Sauvegarder</button>
+                </div>
+
+                <h2 class="page-title">Statistiques</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h4>Jours Servis</h4>
+                        <div class="value" id="daysServed">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Missions</h4>
+                        <div class="value" id="missionsCompleted">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Combats</h4>
+                        <div class="value" id="combatsParticipated">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>Décorations</h4>
+                        <div class="value" id="totalDecorations">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE ACTIONS -->
+            <div id="actions" class="page">
+                <div class="header">
+                    <h1>Actions Quotidiennes</h1>
+                </div>
+                <div class="action-counter">
+                    Actions disponibles: <span id="actionsRemaining">2</span> / <span id="maxActions">2</span>
+                </div>
+                <h2 class="page-title">Activités</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;">
+                    <div class="action-card" onclick="performAction('patrol')">
+                        <h3>🚶 Patrouille</h3>
+                        <p>Patrouille de routine</p>
+                        <div class="effect">+50 XP, +Tactique</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('training')">
+                        <h3>💪 Entraînement</h3>
+                        <p>Combat rapproché</p>
+                        <div class="effect">+75 XP, +Mêlée</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('shooting')">
+                        <h3>🎯 Tir</h3>
+                        <p>Tir à la cible</p>
+                        <div class="effect">+75 XP, +Tir</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('study')">
+                        <h3>📚 Étude</h3>
+                        <p>Étude tactique</p>
+                        <div class="effect">+100 XP, +Tactique</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('inspection')">
+                        <h3>🔍 Inspection</h3>
+                        <p>Diriger les troupes</p>
+                        <div class="effect">+60 XP, +Leadership</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('rest')">
+                        <h3>😴 Repos</h3>
+                        <p>Récupération</p>
+                        <div class="effect">+Santé, -Stress</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('maintenance')">
+                        <h3>🔧 Maintenance</h3>
+                        <p>Entretien d'équipement</p>
+                        <div class="effect">+50 XP, +Mécanique</div>
+                    </div>
+                    <div class="action-card" onclick="performAction('socializing')">
+                        <h3>🍺 Socialisation</h3>
+                        <p>Temps avec camarades</p>
+                        <div class="effect">+Moral, +Relations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE MISSIONS -->
+            <div id="missions" class="page">
+                <div class="header">
+                    <h1>Missions</h1>
+                </div>
+                <h2 class="page-title">Missions Disponibles</h2>
+                <div id="missionsList"></div>
+            </div>
+
+            <!-- PAGE IA MJ -->
+            <div id="ai_gm" class="page">
+                <div class="header">
+                    <h1>IA Maître de Jeu</h1>
+                    <p>Interactions dynamiques avec l'IA</p>
+                </div>
+                <h2 class="page-title">Événement Généré</h2>
+                <div id="aiEvent" style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 15px; border-radius: 4px; margin-bottom: 15px; min-height: 100px;">
+                    <p style="color: #b0b0b0;">Cliquez sur "Générer Événement" pour créer un événement aléatoire</p>
+                </div>
+                <button class="btn btn-primary" onclick="generateAIEvent()">Générer Événement</button>
+                <button class="btn" onclick="generateAIMission()">Générer Mission</button>
+                <button class="btn" onclick="generateAIMessage()">Générer Message</button>
+            </div>
+
+            <!-- PAGE CARRIÈRE -->
+            <div id="career" class="page">
+                <div class="header">
+                    <h1>Carrière Militaire</h1>
+                </div>
+                <h2 class="page-title">Rang Actuel</h2>
+                <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; border-radius: 4px; padding: 15px; margin-bottom: 20px;">
+                    <h3 id="currentRankDisplay" style="color: #d4af37; margin-bottom: 10px;">-</h3>
+                    <div class="skill-bar">
+                        <div class="skill-progress" id="rankProgressBar" style="width: 0%;"></div>
+                    </div>
+                    <p style="color: #b0b0b0; margin-top: 10px; font-size: 11px;">XP: <span id="rankXP">0</span> / <span id="rankXPRequired">1000</span></p>
+                </div>
+                <h2 class="page-title">Historique des Promotions</h2>
+                <div id="promotionsList"></div>
+            </div>
+
+            <!-- PAGE COMPÉTENCES -->
+            <div id="skills" class="page">
+                <div class="header">
+                    <h1>Compétences</h1>
+                </div>
+                <h2 class="page-title">Compétences de Combat</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px;">
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin-bottom: 8px; font-size: 12px;">🎯 Tir</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillShooting" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="skillShootingLevel">Novice (0/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin-bottom: 8px; font-size: 12px;">⚔️ Mêlée</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillMelee" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="skillMeleeLevel">Novice (0/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin-bottom: 8px; font-size: 12px;">⚙️ Tactique</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillTactics" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="skillTacticsLevel">Novice (0/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin-bottom: 8px; font-size: 12px;">👥 Leadership</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillLeadership" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="skillLeadershipLevel">Novice (0/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin-bottom: 8px; font-size: 12px;">🏕️ Survie</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillSurvival" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="skillSurvivalLevel">Novice (0/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; margin-bottom: 8px; font-size: 12px;">🔧 Mécanique</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="skillMechanics" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="skillMechanicsLevel">Novice (0/100)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE DÉCORATIONS -->
+            <div id="decorations" class="page">
+                <div class="header">
+                    <h1>Décorations et Médailles</h1>
+                </div>
+                <h2 class="page-title">Décorations Obtenues</h2>
+                <div id="obtainedDecorations" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 10px; margin-bottom: 20px;">
+                    <p style="color: #b0b0b0; grid-column: 1/-1;">Aucune décoration</p>
+                </div>
+            </div>
+
+            <!-- PAGE RELATIONS -->
+            <div id="relations" class="page">
+                <div class="header">
+                    <h1>Relations</h1>
+                </div>
+                <h2 class="page-title">Contacts</h2>
+                <div id="relationsList"></div>
+            </div>
+
+            <!-- PAGE MESSAGES -->
+            <div id="messages" class="page">
+                <div class="header">
+                    <h1>Messages</h1>
+                </div>
+                <h2 class="page-title">Boîte de Réception</h2>
+                <div id="messagesList"></div>
+            </div>
+
+            <!-- PAGE INVENTAIRE -->
+            <div id="inventory" class="page">
+                <div class="header">
+                    <h1>Inventaire</h1>
+                </div>
+                <h2 class="page-title">Équipement</h2>
+                <div id="inventoryList"></div>
+            </div>
+
+            <!-- PAGE CARTE -->
+            <div id="map" class="page">
+                <div class="header">
+                    <h1>Carte de l'Allemagne</h1>
+                    <p>Localisation actuelle: <span id="currentLocation">Berlin</span></p>
+                </div>
+                <h2 class="page-title">Destinations Disponibles</h2>
+                <div id="locationsList"></div>
+            </div>
+
+            <!-- PAGE SANTÉ -->
+            <div id="health" class="page">
+                <div class="header">
+                    <h1>État Physique</h1>
+                </div>
+                <h2 class="page-title">Santé Générale</h2>
+                <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 15px; border-radius: 4px; margin-bottom: 20px;">
+                    <div class="skill-bar"><div class="skill-progress" id="globalHealth" style="width: 100%;"></div></div>
+                    <div style="color: #b0b0b0; font-size: 11px;" id="globalHealthStatus">Excellent (100/100)</div>
+                </div>
+                <h2 class="page-title">Parties du Corps</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">🗣️ Tête</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthHead" style="width: 100%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="healthHeadStatus">Sain</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">❤️ Poitrine</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthChest" style="width: 100%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="healthChestStatus">Sain</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">💪 Bras Droit</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthArmRight" style="width: 100%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="healthArmRightStatus">Sain</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">🦵 Jambe Droite</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="healthLegRight" style="width: 100%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="healthLegRightStatus">Sain</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE MENTAL -->
+            <div id="mental" class="page">
+                <div class="header">
+                    <h1>État Mental</h1>
+                </div>
+                <h2 class="page-title">Indicateurs Psychologiques</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">😊 Moral</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="mentalMoral" style="width: 100%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="mentalMoralLevel">Excellent (100/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">😰 Stress</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="mentalStress" style="width: 0%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="mentalStressLevel">Faible (0/100)</div>
+                    </div>
+                    <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 12px; border-radius: 4px;">
+                        <h4 style="color: #d4af37; font-size: 11px;">💪 Résilience</h4>
+                        <div class="skill-bar"><div class="skill-progress" id="mentalResilience" style="width: 50%;"></div></div>
+                        <div style="color: #b0b0b0; font-size: 10px;" id="mentalResilienceLevel">Moyen (50/100)</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE JOURNAL -->
+            <div id="journal" class="page">
+                <div class="header">
+                    <h1>Journal de Marche</h1>
+                </div>
+                <h2 class="page-title">Entrées</h2>
+                <div id="journalEntries"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Titre</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">Contenu</div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeModal()">Fermer</button>
+                <button class="btn btn-primary" id="modalAction" style="display: none;" onclick="executeModalAction()">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== BASES DE DONNÉES =====
+        const RANKS = ['Schütze', 'Obergefreiter', 'Unteroffizier', 'Feldwebel', 'Oberfeldwebel', 'Leutnant', 'Oberleutnant', 'Hauptmann', 'Major', 'Oberst'];
+        const LOCATIONS = ['Berlin', 'Munich', 'Hambourg', 'Cologne', 'Dresde', 'Varsovie', 'Paris', 'Stalingrad', 'Normandie', 'Ruhr'];
+        const DECORATIONS_DB = {
+            'Croix de Fer 2ème Classe': '🥈',
+            'Croix de Fer 1ère Classe': '🥇',
+            'Insigne des Blessés': '🩹',
+            'Médaille de Service': '🎖️',
+            'Insigne du Front de l\'Est': '❄️'
+        };
+        const NPCS = [
+            { name: 'Mère', relation: 'Famille', type: 'mother' },
+            { name: 'Père', relation: 'Famille', type: 'father' },
+            { name: 'Camarade 1', relation: 'Ami', type: 'friend' },
+            { name: 'Camarade 2', relation: 'Ami', type: 'friend' },
+            { name: 'Commandant', relation: 'Supérieur', type: 'superior' }
+        ];
+        const INVENTORY_ITEMS = [
+            { name: 'Mauser K98', type: 'weapon', quantity: 1 },
+            { name: 'Munitions', type: 'ammo', quantity: 120 },
+            { name: 'Uniforme', type: 'clothing', quantity: 1 },
+            { name: 'Rations', type: 'food', quantity: 5 },
+            { name: 'Lettre familiale', type: 'personal', quantity: 1 }
+        ];
+
+        // ===== ÉTAT DU JEU =====
+        let gameState = {
+            player: {
+                name: '', rank: 0, experience: 0, health: 100, moral: 100, stress: 0,
+                daysServed: 0, missionsCompleted: 0, combatsParticipated: 0,
+                decorations: [], skills: { shooting: 0, melee: 0, tactics: 0, leadership: 0, survival: 0, mechanics: 0 },
+                health_parts: { head: 100, chest: 100, armRight: 100, legRight: 100 },
+                mental: { moral: 100, stress: 0, resilience: 50 },
+                relations: {}, messages: [], journal: [], inventory: INVENTORY_ITEMS.slice(),
+                location: 'Berlin', branch: '', specialization: ''
+            },
+            gameStarted: false,
+            currentDate: new Date(1933, 0, 30),
+            actionsToday: 0,
+            maxActionsPerDay: 2,
+            isWarTime: false
+        };
+
+        // ===== FONCTIONS PRINCIPALES =====
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            if (pageId === 'dashboard' && gameState.gameStarted) updateDashboard();
+            if (pageId === 'relations' && gameState.gameStarted) updateRelations();
+            if (pageId === 'messages' && gameState.gameStarted) updateMessages();
+            if (pageId === 'inventory' && gameState.gameStarted) updateInventory();
+            if (pageId === 'map' && gameState.gameStarted) updateMap();
+            if (pageId === 'missions' && gameState.gameStarted) updateMissions();
+        }
+
+        function startGame() {
+            const name = document.getElementById('playerName').value;
+            if (!name) { alert('Veuillez entrer un nom'); return; }
+            gameState.player.name = name;
+            gameState.player.branch = document.getElementById('branch').value;
+            gameState.player.specialization = document.getElementById('specialization').value;
+            gameState.gameStarted = true;
+            gameState.currentDate = new Date(1933, 0, 30);
+            gameState.isWarTime = false;
+            NPCS.forEach(npc => { gameState.player.relations[npc.name] = 50; });
+            addJournalEntry('Début de la simulation - Vous êtes recruté dans l\'armée allemande');
+            updateDashboard();
+            showPage('dashboard');
+            saveGame();
+        }
+
+        function updateDashboard() {
+            document.getElementById('dashboardName').textContent = gameState.player.name;
+            document.getElementById('dashboardRank').textContent = RANKS[gameState.player.rank] || '-';
+            document.getElementById('dashboardBranch').textContent = gameState.player.branch.toUpperCase();
+            document.getElementById('dashboardDate').textContent = gameState.currentDate.toLocaleDateString('fr-FR');
+            document.getElementById('dashboardHealth').textContent = Math.floor(gameState.player.health) + '%';
+            document.getElementById('dashboardMoral').textContent = Math.floor(gameState.player.mental.moral) + '%';
+            document.getElementById('daysServed').textContent = gameState.player.daysServed;
+            document.getElementById('missionsCompleted').textContent = gameState.player.missionsCompleted;
+            document.getElementById('combatsParticipated').textContent = gameState.player.combatsParticipated;
+            document.getElementById('totalDecorations').textContent = gameState.player.decorations.length;
+            document.getElementById('currentXP').textContent = Math.floor(gameState.player.experience);
+            document.getElementById('nextRankXP').textContent = (gameState.player.rank + 1) * 1000;
+            document.getElementById('expBar').style.width = (gameState.player.experience % 1000) / 10 + '%';
+            document.getElementById('actionsRemaining').textContent = gameState.maxActionsPerDay - gameState.actionsToday;
+            document.getElementById('maxActions').textContent = gameState.maxActionsPerDay;
+            updateSkills();
+            updateHealth();
+            updateMental();
+        }
+
+        function advanceDay() {
+            const timeMultiplier = gameState.isWarTime ? 1 : 3;
+            gameState.currentDate.setDate(gameState.currentDate.getDate() + 1);
+            gameState.player.daysServed += 1;
+            gameState.player.experience += Math.random() * 10;
+            gameState.player.mental.stress += Math.random() * 2;
+            gameState.player.mental.moral -= Math.random() * 1;
+            if (gameState.player.mental.stress > 100) gameState.player.mental.stress = 100;
+            if (gameState.player.mental.moral < 0) gameState.player.mental.moral = 0;
+            gameState.actionsToday = 0;
+            if (gameState.currentDate.getFullYear() === 1939 && gameState.currentDate.getMonth() === 8 && gameState.currentDate.getDate() === 1) {
+                gameState.isWarTime = true;
+                addJournalEntry('La Seconde Guerre mondiale a commencé!');
+            }
+            checkPromotion();
+            updateDashboard();
+            saveGame();
+        }
+
+        function advanceWeek() {
+            for (let i = 0; i < 7; i++) advanceDay();
+        }
+
+        function advanceMonth() {
+            for (let i = 0; i < 30; i++) advanceDay();
+        }
+
+        function performAction(action) {
+            if (gameState.actionsToday >= gameState.maxActionsPerDay) {
+                showModal('Limite d\'actions', 'Vous avez atteint le nombre maximum d\'actions pour aujourd\'hui.');
+                return;
+            }
+            const actions = {
+                patrol: { xp: 50, skills: ['tactics'], moral: 10, stress: -5 },
+                training: { xp: 75, skills: ['melee'], moral: 5, stress: 10 },
+                shooting: { xp: 75, skills: ['shooting'], moral: 5, stress: 10 },
+                study: { xp: 100, skills: ['tactics', 'leadership'], moral: 0, stress: 15 },
+                inspection: { xp: 60, skills: ['leadership'], moral: 20, stress: 5 },
+                rest: { xp: 20, skills: [], moral: 30, stress: -20, health: 20 },
+                maintenance: { xp: 50, skills: ['mechanics'], moral: 5, stress: 0 },
+                socializing: { xp: 40, skills: ['leadership'], moral: 40, stress: -10 }
+            };
+            const act = actions[action];
+            if (!act) return;
+            gameState.player.experience += act.xp;
+            gameState.player.mental.moral += act.moral;
+            gameState.player.mental.stress += act.stress;
+            if (gameState.player.health < 100 && act.health) gameState.player.health = Math.min(100, gameState.player.health + act.health);
+            if (gameState.player.mental.moral > 100) gameState.player.mental.moral = 100;
+            if (gameState.player.mental.stress > 100) gameState.player.mental.stress = 100;
+            act.skills.forEach(skill => {
+                gameState.player.skills[skill] = Math.min(100, gameState.player.skills[skill] + Math.random() * 5);
+            });
+            gameState.actionsToday++;
+            advanceDay();
+            showModal('Action Effectuée', `Vous avez effectué l'action avec succès! +${act.xp} XP`);
+        }
+
+        function checkPromotion() {
+            const nextRankXP = (gameState.player.rank + 1) * 1000;
+            if (gameState.player.experience >= nextRankXP && gameState.player.rank < RANKS.length - 1) {
+                gameState.player.rank += 1;
+                addJournalEntry(`Promotion à ${RANKS[gameState.player.rank]}!`);
+                showModal('Promotion!', `Vous êtes promu à ${RANKS[gameState.player.rank]}!`);
+            }
+        }
+
+        function updateSkills() {
+            document.getElementById('skillShooting').style.width = gameState.player.skills.shooting + '%';
+            document.getElementById('skillShootingLevel').textContent = `${getLevel(gameState.player.skills.shooting)} (${Math.floor(gameState.player.skills.shooting)}/100)`;
+            document.getElementById('skillMelee').style.width = gameState.player.skills.melee + '%';
+            document.getElementById('skillMeleeLevel').textContent = `${getLevel(gameState.player.skills.melee)} (${Math.floor(gameState.player.skills.melee)}/100)`;
+            document.getElementById('skillTactics').style.width = gameState.player.skills.tactics + '%';
+            document.getElementById('skillTacticsLevel').textContent = `${getLevel(gameState.player.skills.tactics)} (${Math.floor(gameState.player.skills.tactics)}/100)`;
+            document.getElementById('skillLeadership').style.width = gameState.player.skills.leadership + '%';
+            document.getElementById('skillLeadershipLevel').textContent = `${getLevel(gameState.player.skills.leadership)} (${Math.floor(gameState.player.skills.leadership)}/100)`;
+            document.getElementById('skillSurvival').style.width = gameState.player.skills.survival + '%';
+            document.getElementById('skillSurvivalLevel').textContent = `${getLevel(gameState.player.skills.survival)} (${Math.floor(gameState.player.skills.survival)}/100)`;
+            document.getElementById('skillMechanics').style.width = gameState.player.skills.mechanics + '%';
+            document.getElementById('skillMechanicsLevel').textContent = `${getLevel(gameState.player.skills.mechanics)} (${Math.floor(gameState.player.skills.mechanics)}/100)`;
+        }
+
+        function updateHealth() {
+            document.getElementById('globalHealth').style.width = gameState.player.health + '%';
+            document.getElementById('globalHealthStatus').textContent = `${getHealthStatus(gameState.player.health)} (${Math.floor(gameState.player.health)}/100)`;
+            document.getElementById('healthHead').style.width = gameState.player.health_parts.head + '%';
+            document.getElementById('healthHeadStatus').textContent = gameState.player.health_parts.head > 75 ? 'Sain' : gameState.player.health_parts.head > 25 ? 'Blessé' : 'Critique';
+            document.getElementById('healthChest').style.width = gameState.player.health_parts.chest + '%';
+            document.getElementById('healthChestStatus').textContent = gameState.player.health_parts.chest > 75 ? 'Sain' : gameState.player.health_parts.chest > 25 ? 'Blessé' : 'Critique';
+            document.getElementById('healthArmRight').style.width = gameState.player.health_parts.armRight + '%';
+            document.getElementById('healthArmRightStatus').textContent = gameState.player.health_parts.armRight > 75 ? 'Sain' : gameState.player.health_parts.armRight > 25 ? 'Blessé' : 'Critique';
+            document.getElementById('healthLegRight').style.width = gameState.player.health_parts.legRight + '%';
+            document.getElementById('healthLegRightStatus').textContent = gameState.player.health_parts.legRight > 75 ? 'Sain' : gameState.player.health_parts.legRight > 25 ? 'Blessé' : 'Critique';
+        }
+
+        function updateMental() {
+            document.getElementById('mentalMoral').style.width = gameState.player.mental.moral + '%';
+            document.getElementById('mentalMoralLevel').textContent = `${getLevel(gameState.player.mental.moral)} (${Math.floor(gameState.player.mental.moral)}/100)`;
+            document.getElementById('mentalStress').style.width = gameState.player.mental.stress + '%';
+            document.getElementById('mentalStressLevel').textContent = `${getLevel(gameState.player.mental.stress)} (${Math.floor(gameState.player.mental.stress)}/100)`;
+            document.getElementById('mentalResilience').style.width = gameState.player.mental.resilience + '%';
+            document.getElementById('mentalResilienceLevel').textContent = `${getLevel(gameState.player.mental.resilience)} (${Math.floor(gameState.player.mental.resilience)}/100)`;
+        }
+
+        function updateRelations() {
+            const html = NPCS.map(npc => `
+                <div class="npc-card">
+                    <div class="name">${npc.name}</div>
+                    <div class="relation">Relation: ${Math.floor(gameState.player.relations[npc.name])}%</div>
+                    <button class="btn" style="margin-top: 8px; font-size: 10px;" onclick="interactWithNPC('${npc.name}')">Interagir</button>
+                </div>
+            `).join('');
+            document.getElementById('relationsList').innerHTML = html;
+        }
+
+        function updateMessages() {
+            const html = gameState.player.messages.length > 0 ? gameState.player.messages.map(msg => `
+                <div class="message-box">
+                    <div class="sender">${msg.sender}</div>
+                    <div class="content">${msg.content}</div>
+                </div>
+            `).join('') : '<p style="color: #b0b0b0;">Aucun message</p>';
+            document.getElementById('messagesList').innerHTML = html;
+        }
+
+        function updateInventory() {
+            const html = gameState.player.inventory.map(item => `
+                <div style="background: rgba(212, 175, 55, 0.05); border: 1px solid #d4af37; padding: 10px; border-radius: 4px; margin-bottom: 8px;">
+                    <p style="color: #d4af37; font-weight: bold; font-size: 12px;">${item.name}</p>
+                    <p style="color: #b0b0b0; font-size: 10px;">Quantité: ${item.quantity}</p>
+                </div>
+            `).join('');
+            document.getElementById('inventoryList').innerHTML = html;
+        }
+
+        function updateMap() {
+            document.getElementById('currentLocation').textContent = gameState.player.location;
+            const html = LOCATIONS.filter(loc => loc !== gameState.player.location).map(loc => `
+                <div class="location-card" onclick="travelTo('${loc}')">
+                    <h3>📍 ${loc}</h3>
+                    <p>Cliquez pour voyager</p>
+                </div>
+            `).join('');
+            document.getElementById('locationsList').innerHTML = html;
+        }
+
+        function updateMissions() {
+            const missions = [
+                { name: 'Reconnaissance', xp: 500, prestige: 100, days: 3 },
+                { name: 'Patrouille Défensive', xp: 300, prestige: 50, days: 2 },
+                { name: 'Raid Nocturne', xp: 700, prestige: 150, days: 1 }
+            ];
+            const html = missions.map(m => `
+                <div class="action-card" onclick="acceptMission('${m.name}', ${m.xp}, ${m.prestige}, ${m.days})">
+                    <h3>🎯 ${m.name}</h3>
+                    <p>Durée: ${m.days} jour(s)</p>
+                    <div class="effect">+${m.xp} XP, +${m.prestige} Prestige</div>
+                </div>
+            `).join('');
+            document.getElementById('missionsList').innerHTML = html;
+        }
+
+        function acceptMission(name, xp, prestige, days) {
+            gameState.player.experience += xp;
+            gameState.player.missionsCompleted += 1;
+            for (let i = 0; i < days; i++) advanceDay();
+            addJournalEntry(`Mission complétée: ${name}`);
+            showModal('Mission Acceptée', `Mission: ${name}\n+${xp} XP, +${prestige} Prestige`);
+        }
+
+        function travelTo(location) {
+            gameState.player.location = location;
+            advanceDay();
+            showModal('Voyage', `Vous avez voyagé à ${location}`);
+        }
+
+        function interactWithNPC(npcName) {
+            const messages = [
+                `${npcName} vous dit bonjour.`,
+                `${npcName} vous demande comment vous allez.`,
+                `${npcName} partage des nouvelles avec vous.`
+            ];
+            const msg = messages[Math.floor(Math.random() * messages.length)];
+            gameState.player.relations[npcName] = Math.min(100, gameState.player.relations[npcName] + 5);
+            showModal(`Interaction avec ${npcName}`, msg);
+        }
+
+        function generateAIEvent() {
+            const events = [
+                'Vous recevez une lettre de votre famille.',
+                'Un camarade vous propose de prendre un verre.',
+                'Vous êtes sélectionné pour une mission spéciale.',
+                'Un événement historique se déroule.',
+                'Vous recevez une promotion inattendue.'
+            ];
+            const event = events[Math.floor(Math.random() * events.length)];
+            document.getElementById('aiEvent').innerHTML = `<p style="color: #e0e0e0;">${event}</p>`;
+            addJournalEntry(`Événement IA: ${event}`);
+        }
+
+        function generateAIMission() {
+            const missions = ['Reconnaissance', 'Patrouille', 'Raid', 'Escorte', 'Défense'];
+            const mission = missions[Math.floor(Math.random() * missions.length)];
+            document.getElementById('aiEvent').innerHTML = `<p style="color: #e0e0e0;">Nouvelle mission: ${mission}</p>`;
+        }
+
+        function generateAIMessage() {
+            const senders = ['Mère', 'Père', 'Camarade', 'Commandant', 'Haut Commandement'];
+            const sender = senders[Math.floor(Math.random() * senders.length)];
+            const messages = ['Comment allez-vous?', 'Nous pensons à vous.', 'Ordres importants à suivre.', 'Bonne chance.'];
+            const content = messages[Math.floor(Math.random() * messages.length)];
+            gameState.player.messages.push({ sender, content });
+            showModal('Nouveau Message', `De: ${sender}\n${content}`);
+        }
+
+        function addJournalEntry(content) {
+            gameState.player.journal.push({ date: gameState.currentDate.toLocaleDateString('fr-FR'), content });
+            const journalEntries = document.getElementById('journalEntries');
+            journalEntries.innerHTML = gameState.player.journal.slice(-10).reverse().map(e => `
+                <div class="journal-entry">
+                    <div class="date">${e.date}</div>
+                    <div class="content">${e.content}</div>
+                </div>
+            `).join('');
+        }
+
+        function getLevel(value) {
+            if (value < 20) return 'Novice';
+            if (value < 40) return 'Apprenti';
+            if (value < 60) return 'Compétent';
+            if (value < 80) return 'Expert';
+            return 'Maître';
+        }
+
+        function getHealthStatus(value) {
+            if (value > 75) return 'Excellent';
+            if (value > 50) return 'Bon';
+            if (value > 25) return 'Blessé';
+            return 'Critique';
+        }
+
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').textContent = content;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        function saveGame() {
+            localStorage.setItem('eisernesKreuzSave', JSON.stringify(gameState));
+        }
+
+        function loadGame() {
+            const saved = localStorage.getItem('eisernesKreuzSave');
+            if (saved) {
+                gameState = JSON.parse(saved);
+                gameState.currentDate = new Date(gameState.currentDate);
+                gameState.gameStarted = true;
+                updateDashboard();
+                showPage('dashboard');
+                document.querySelectorAll('.nav-button')[1].classList.add('active');
+            } else {
+                alert('Aucune sauvegarde trouvée');
+            }
+        }
+
+        function resetGame() {
+            if (confirm('Êtes-vous sûr de vouloir recommencer?')) {
+                localStorage.removeItem('eisernesKreuzSave');
+                location.reload();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const saved = localStorage.getItem('eisernesKreuzSave');
+            if (saved) {
+                const btn = document.querySelector('button[onclick="loadGame()"]');
+                if (btn) btn.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
