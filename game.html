@@ -16,7 +16,8 @@
             min-height: 100vh;
         }
         .container { display: flex; min-height: 100vh; }
-        .sidebar { 
+        .sidebar {
+                transition: margin-left 0.3s ease; 
             width: 280px; 
             background: linear-gradient(180deg, #0d0d1a 0%, #1a1a2e 50%, #0d0d1a 100%); 
             border-right: 4px solid #d4af37; 
@@ -561,6 +562,7 @@
 <body>
     <div class="container">
         <div class="sidebar">
+            <button id="sidebarToggle">&#9776;</button>
             <h1>Eisernes Kreuz</h1>
             <div class="nav-section">
                 <h3>Général</h3>
@@ -1066,6 +1068,10 @@
 
         // ===== FONCTIONS PRINCIPALES =====
         function showPage(pageId) {
+            if (!gameState.gameStarted && pageId !== 'creation') {
+                showModal('Jeu non commencé', 'Veuillez d\'abord créer un personnage.');
+                return;
+            }
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
@@ -1162,6 +1168,21 @@ HISTORICAL_EVENTS.forEach(event => {
                 return;
             }
             const actions = {
+                heer: {
+                    patrol: { xp: 50, skills: ["tactics"], moral: 10, stress: -5 },
+                    training: { xp: 75, skills: ["melee"], moral: 5, stress: 10 },
+                },
+                luftwaffe: {
+                    reconnaissance: { xp: 100, skills: ["tactics"], moral: 15, stress: -10 },
+                    dogfight: { xp: 150, skills: ["shooting"], moral: 20, stress: 20 },
+                },
+                kriegsmarine: {
+                    patrol: { xp: 60, skills: ["tactics"], moral: 10, stress: -5 },
+                    gunnery: { xp: 120, skills: ["shooting"], moral: 15, stress: 15 },
+                }
+            };
+
+            const old_actions = {
                 patrol: { xp: 50, skills: ['tactics'], moral: 10, stress: -5 },
                 training: { xp: 75, skills: ['melee'], moral: 5, stress: 10 },
                 shooting: { xp: 75, skills: ['shooting'], moral: 5, stress: 10 },
@@ -1171,7 +1192,7 @@ HISTORICAL_EVENTS.forEach(event => {
                 maintenance: { xp: 50, skills: ['mechanics'], moral: 5, stress: 0 },
                 socializing: { xp: 40, skills: ['leadership'], moral: 40, stress: -10 }
             };
-            const act = actions[action];
+            const act = actions[gameState.player.branch][action];
             if (!act) return;
             gameState.player.experience += act.xp;
             gameState.player.mental.moral += act.moral;
