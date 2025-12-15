@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="description" content="Eisernes Kreuz - Simulation Totale: Une simulation immersive de la vie d'un soldat allemand (1933-1945)">
+    <title>Eisernes Kreuz – Simulation Totale</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background-color: #0a0a0a;
+            color: #e8e8e8;
+            line-height: 1.6;
+            overflow: hidden;
+        }
+
+        #game-container {
+            width: 100vw;
+            height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+        }
+
+        .header {
+            background-color: #1a1a1a;
+            border-bottom: 2px solid #8b0000;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #d4af37;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9);
+        }
+
+        .date-display {
+            font-size: 16px;
+            color: #a8a8a8;
+            font-style: italic;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 15px;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        .panel {
+            background-color: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .panel h2 {
+            color: #d4af37;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #555;
+            padding-bottom: 8px;
+            font-size: 16px;
+            letter-spacing: 1px;
+        }
+
+        .panel h3 {
+            color: #a8a8a8;
+            margin-top: 12px;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #333;
+            font-size: 13px;
+        }
+
+        .stat-label {
+            color: #a8a8a8;
+        }
+
+        .stat-value {
+            color: #e8e8e8;
+            font-weight: bold;
+        }
+
+        .journal-entry {
+            background-color: #0f0f0f;
+            border-left: 3px solid #8b0000;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 2px;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .journal-date {
+            color: #d4af37;
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .journal-text {
+            color: #c8c8c8;
+        }
+
+        .footer {
+            background-color: #1a1a1a;
+            border-top: 2px solid #8b0000;
+            padding: 12px 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        button {
+            background-color: #8b0000;
+            color: #e8e8e8;
+            border: 1px solid #d4af37;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        button:hover {
+            background-color: #a00000;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: #1a1a1a;
+            border: 2px solid #8b0000;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.8);
+        }
+
+        .modal-content h2 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .modal-content p {
+            margin-bottom: 12px;
+            color: #c8c8c8;
+            line-height: 1.6;
+        }
+
+        .choice-button {
+            display: block;
+            width: 100%;
+            margin-top: 10px;
+            text-align: left;
+            padding: 12px;
+            background-color: #0f0f0f;
+            border: 1px solid #555;
+            color: #e8e8e8;
+            cursor: pointer;
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        .choice-button:hover {
+            background-color: #2a2a2a;
+            border-color: #d4af37;
+            color: #d4af37;
+        }
+
+        .combat-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 4px;
+            margin: 15px 0;
+        }
+
+        .combat-tile {
+            aspect-ratio: 1;
+            background-color: #0f0f0f;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.2s ease;
+        }
+
+        .combat-tile:hover {
+            background-color: #2a2a2a;
+            border-color: #d4af37;
+        }
+
+        .combat-tile.player {
+            background-color: #004400;
+            border-color: #00aa00;
+        }
+
+        .combat-tile.enemy {
+            background-color: #440000;
+            border-color: #aa0000;
+        }
+
+        .combat-tile.cover {
+            background-color: #444444;
+            border-color: #888888;
+        }
+
+        .health-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #0f0f0f;
+            border: 1px solid #555;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 5px 0;
+        }
+
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00aa00 0%, #aaaa00 50%, #aa0000 100%);
+            width: 100%;
+            transition: width 0.3s ease;
+        }
+
+        .scrollable {
+            overflow-y: auto;
+            max-height: calc(100% - 50px);
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0f0f0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #8b0000;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a00000;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div class="header">
+            <h1>⚔ EISERNES KREUZ ⚔</h1>
+            <div class="date-display" id="date-display">30 Janvier 1933</div>
+        </div>
+
+        <div class="main-content" id="main-content">
+            <!-- Contenu dynamique -->
+        </div>
+
+        <div class="footer">
+            <button id="continue-button">Continuer</button>
+            <button id="save-button">Sauvegarder</button>
+            <button id="load-button">Charger</button>
+            <button id="menu-button">Menu</button>
+        </div>
+    </div>
+
+    <!-- Modal pour les dialogues et événements -->
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="event-title">Événement</h2>
+            <div id="event-text"></div>
+            <div id="event-choices"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SECTION 1: BASES DE DONNÉES
+        // ============================================
+
+        const RANKS_DB = {
+            heer: [
+                { id: 1, title: 'Schütze', pay: 78, authority: 0, description: 'Soldat d\'infanterie' },
+                { id: 2, title: 'Gefreiter', pay: 95, authority: 1, description: 'Soldat de première classe' },
+                { id: 3, title: 'Unteroffizier', pay: 130, authority: 2, description: 'Sous-officier' },
+                { id: 4, title: 'Feldwebel', pay: 170, authority: 3, description: 'Sergent' },
+                { id: 5, title: 'Leutnant', pay: 250, authority: 5, description: 'Officier subalterne' },
+                { id: 6, title: 'Hauptmann', pay: 350, authority: 7, description: 'Capitaine' },
+                { id: 7, title: 'Major', pay: 450, authority: 8, description: 'Commandant' },
+                { id: 8, title: 'Oberst', pay: 600, authority: 10, description: 'Colonel' }
+            ],
+            luftwaffe: [
+                { id: 1, title: 'Flieger', pay: 78, authority: 0, description: 'Aviateur' },
+                { id: 2, title: 'Gefreiter', pay: 95, authority: 1, description: 'Aviateur de première classe' },
+                { id: 3, title: 'Unteroffizier', pay: 130, authority: 2, description: 'Sous-officier' },
+                { id: 4, title: 'Feldwebel', pay: 170, authority: 3, description: 'Sergent' },
+                { id: 5, title: 'Leutnant', pay: 250, authority: 5, description: 'Officier subalterne' },
+                { id: 6, title: 'Hauptmann', pay: 350, authority: 7, description: 'Capitaine' }
+            ],
+            kriegsmarine: [
+                { id: 1, title: 'Matrose', pay: 78, authority: 0, description: 'Matelot' },
+                { id: 2, title: 'Obermatrose', pay: 95, authority: 1, description: 'Matelot de première classe' },
+                { id: 3, title: 'Bootsmannsmaat', pay: 130, authority: 2, description: 'Maître d\'équipage' },
+                { id: 4, title: 'Leutnant zur See', pay: 250, authority: 5, description: 'Enseigne de vaisseau' },
+                { id: 5, title: 'Kapitänleutnant', pay: 350, authority: 7, description: 'Capitaine de corvette' }
+            ]
+        };
+
+        const MILITARY_BRANCHES = {
+            heer: {
+                name: 'Heer',
+                description: 'Armée de Terre',
+                units: [
+                    { id: 'gd', name: 'Infanterie-Regiment Großdeutschland', type: 'Élite', size: 3000 },
+                    { id: '291id', name: '291. Infanterie-Division', type: 'Standard', size: 15000 },
+                    { id: '2pz', name: '2. Panzer-Division', type: 'Blindée', size: 12000 },
+                    { id: '6armee', name: '6. Armee', type: 'Armée', size: 250000 },
+                    { id: 'dak', name: 'Deutsches Afrikakorps', type: 'Spécialisée', size: 100000 }
+                ],
+                roles: [
+                    { id: 'rifleman', name: 'Fusilier', description: 'Infanterie légère' },
+                    { id: 'grenadier', name: 'Grenadier', description: 'Infanterie de choc' },
+                    { id: 'mg', name: 'Mitrailleur', description: 'Opérateur MG42' },
+                    { id: 'sniper', name: 'Sniper', description: 'Tireur d\'élite' },
+                    { id: 'engineer', name: 'Pionnier', description: 'Sapeur' },
+                    { id: 'tank_driver', name: 'Pilote de Char', description: 'Conducteur de Panzer' },
+                    { id: 'tank_gunner', name: 'Tireur de Char', description: 'Artilleur de tourelle' },
+                    { id: 'officer', name: 'Officier', description: 'Commandant' }
+                ],
+                weapons: [
+                    { id: 'kar98k', name: 'Mauser Kar98k', type: 'Rifle', damage: 45, range: 400 },
+                    { id: 'mp40', name: 'MP 40', type: 'SMG', damage: 25, range: 100 },
+                    { id: 'mg42', name: 'MG 42', type: 'LMG', damage: 35, range: 600, rof: 1200 },
+                    { id: 'luger', name: 'Luger P08', type: 'Pistol', damage: 20, range: 50 },
+                    { id: 'grenade', name: 'Stielhandgranate 24', type: 'Grenade', damage: 60, range: 30 }
+                ],
+                vehicles: [
+                    { id: 'kubelwagen', name: 'Kübelwagen', type: 'Light', crew: 4, armor: 5 },
+                    { id: 'sdkfz251', name: 'Sd.Kfz. 251', type: 'APC', crew: 10, armor: 15 },
+                    { id: 'pz3', name: 'Panzer III', type: 'Medium Tank', crew: 5, armor: 50, gun: 37 },
+                    { id: 'pz4', name: 'Panzer IV', type: 'Medium Tank', crew: 5, armor: 80, gun: 75 },
+                    { id: 'panther', name: 'Panther', type: 'Medium Tank', crew: 5, armor: 110, gun: 75 },
+                    { id: 'tiger', name: 'Tiger I', type: 'Heavy Tank', crew: 5, armor: 100, gun: 88 }
+                ]
+            },
+            luftwaffe: {
+                name: 'Luftwaffe',
+                description: 'Armée de l\'Air',
+                units: [
+                    { id: 'jg2', name: 'JG 2 "Richthofen"', type: 'Chasse', size: 1200 },
+                    { id: 'jg52', name: 'JG 52', type: 'Chasse', size: 1200 },
+                    { id: 'kg51', name: 'KG 51 "Edelweiss"', type: 'Bombardement', size: 1500 },
+                    { id: 'sg2', name: 'SG 2 "Immelmann"', type: 'Attaque au sol', size: 800 }
+                ],
+                roles: [
+                    { id: 'fighter_pilot', name: 'Pilote de Chasse', description: 'Chasseur aérien' },
+                    { id: 'bomber_pilot', name: 'Pilote de Bombardier', description: 'Bombardier' },
+                    { id: 'gunner', name: 'Mitrailleur', description: 'Artilleur de bord' },
+                    { id: 'mechanic', name: 'Mécanicien', description: 'Maintenance aéronautique' }
+                ],
+                aircraft: [
+                    { id: 'bf109', name: 'Bf 109 G', type: 'Fighter', speed: 640, ceiling: 11750, weapons: 2 },
+                    { id: 'fw190', name: 'Fw 190 A', type: 'Fighter', speed: 656, ceiling: 11410, weapons: 4 },
+                    { id: 'me262', name: 'Me 262', type: 'Jet Fighter', speed: 870, ceiling: 11450, weapons: 4 },
+                    { id: 'ju87', name: 'Ju 87 Stuka', type: 'Dive Bomber', speed: 410, ceiling: 8000, weapons: 2 },
+                    { id: 'he111', name: 'He 111', type: 'Bomber', speed: 440, ceiling: 8500, weapons: 7 }
+                ]
+            },
+            kriegsmarine: {
+                name: 'Kriegsmarine',
+                description: 'Marine de Guerre',
+                units: [
+                    { id: '7uflottille', name: '7. U-Flottille', type: 'Sous-marine', size: 50 },
+                    { id: 'hochseeflotte', name: 'Hochseeflotte', type: 'Surface', size: 200 }
+                ],
+                roles: [
+                    { id: 'u_boat_captain', name: 'Commandant U-Boot', description: 'Capitaine de sous-marin' },
+                    { id: 'u_boat_crew', name: 'Équipage U-Boot', description: 'Marin sous-marinier' },
+                    { id: 'surface_crew', name: 'Équipage Surface', description: 'Marin de surface' }
+                ],
+                ships: [
+                    { id: 'uboat7c', name: 'U-Boot Type VII-C', type: 'Submarine', displacement: 769, crew: 44 },
+                    { id: 'uboat9', name: 'U-Boot Type IX', type: 'Submarine', displacement: 1120, crew: 48 },
+                    { id: 'bismarck', name: 'Bismarck', type: 'Battleship', displacement: 50000, crew: 2224 },
+                    { id: 'prinzeugen', name: 'Prinz Eugen', type: 'Heavy Cruiser', displacement: 14000, crew: 1270 }
+                ]
+            }
+        };
+
+        const HISTORICAL_EVENTS = [
+            { date: '1933-01-30', title: 'Prise de pouvoir d\'Hitler', description: 'Hitler est nommé chancelier du Reich allemand.', effects: { morale: 5, ideology: 10 } },
+            { date: '1933-03-23', title: 'Loi des pleins pouvoirs', description: 'Le Reichstag vote la loi des pleins pouvoirs, donnant à Hitler le pouvoir absolu.', effects: { ideology: 5 } },
+            { date: '1935-03-16', title: 'Réarmement de l\'Allemagne', description: 'L\'Allemagne annonce son réarmement, violant le Traité de Versailles.', effects: { morale: 10 } },
+            { date: '1936-07-17', title: 'Guerre d\'Espagne', description: 'La Légion Condor allemande intervient en Espagne aux côtés de Franco.', effects: { morale: 5 } },
+            { date: '1938-03-12', title: 'Anschluss', description: 'L\'Allemagne annexe l\'Autriche. Pas de résistance.', effects: { morale: 15, ideology: 5 } },
+            { date: '1938-09-01', title: 'Crise des Sudètes', description: 'Les Accords de Munich livrent les Sudètes à l\'Allemagne.', effects: { morale: 10 } },
+            { date: '1939-09-01', title: 'Invasion de la Pologne', description: 'L\'Allemagne envahit la Pologne. Début de la Seconde Guerre mondiale.', effects: { morale: -5, state: 'COMBAT' } },
+            { date: '1940-05-10', title: 'Campagne de l\'Ouest', description: 'L\'Allemagne envahit la Belgique, les Pays-Bas et la France.', effects: { morale: 10 } },
+            { date: '1940-06-22', title: 'Armistice français', description: 'La France capitule. L\'Allemagne occupe Paris.', effects: { morale: 20 } },
+            { date: '1941-06-22', title: 'Opération Barbarossa', description: 'L\'Allemagne envahit l\'Union soviétique. Début de la Guerre à l\'Est.', effects: { morale: -10, state: 'COMBAT' } },
+            { date: '1941-12-11', title: 'Déclaration de guerre aux USA', description: 'L\'Allemagne déclare la guerre aux États-Unis.', effects: { morale: -15 } },
+            { date: '1942-08-23', title: 'Bataille de Stalingrad', description: 'Début de la bataille de Stalingrad. Combat urbain intense.', effects: { morale: -20, state: 'COMBAT' } },
+            { date: '1942-11-23', title: 'Encerclement à Stalingrad', description: 'La 6e Armée est encerclée par les Soviétiques.', effects: { morale: -30 } },
+            { date: '1943-02-02', title: 'Capitulation de Stalingrad', description: 'La 6e Armée capitule. Fin de la bataille de Stalingrad.', effects: { morale: -40 } },
+            { date: '1943-07-05', title: 'Bataille de Koursk', description: 'Début de la plus grande bataille de chars de l\'histoire.', effects: { morale: -10, state: 'COMBAT' } },
+            { date: '1944-06-06', title: 'Débarquement de Normandie', description: 'Les Alliés débarquent en Normandie. Début de la libération de l\'Europe.', effects: { morale: -25 } },
+            { date: '1944-07-20', title: 'Attentat contre Hitler', description: 'Des officiers allemands tentent d\'assassiner Hitler. L\'attentat échoue.', effects: { morale: -10, ideology: -10 } },
+            { date: '1945-01-12', title: 'Offensive soviétique finale', description: 'L\'Armée Rouge lance son offensive finale vers l\'Allemagne.', effects: { morale: -40 } },
+            { date: '1945-04-30', title: 'Suicide d\'Hitler', description: 'Hitler se suicide dans son bunker à Berlin.', effects: { morale: -50 } },
+            { date: '1945-05-08', title: 'Capitulation inconditionnelle', description: 'L\'Allemagne capitule sans condition. Fin de la Seconde Guerre mondiale.', effects: { morale: -100, state: 'ENDED' } }
+        ];
+
+        const DECORATIONS = [
+            { id: 'ekii', name: 'Croix de Fer 2e Classe', description: 'Décoration pour acte de bravoure', effect: { morale: 10, influence: 3 } },
+            { id: 'eki', name: 'Croix de Fer 1ère Classe', description: 'Décoration supérieure pour bravoure exceptionnelle', effect: { morale: 20, influence: 5 } },
+            { id: 'knight', name: 'Croix de Chevalier', description: 'Plus haute décoration pour commandement et bravoure', effect: { morale: 50, influence: 10 } },
+            { id: 'wound', name: 'Insigne des Blessés', description: 'Décoration pour blessure au combat', effect: { morale: 5 } }
+        ];
+
+        const COMBAT_SYSTEM = {
+            actionCosts: {
+                move: 1,
+                aim: 2,
+                shoot: 3,
+                grenade: 4,
+                takeCover: 1,
+                reload: 3,
+                melee: 2
+            },
+            damageModifiers: {
+                headshot: 2.5,
+                torso: 1.0,
+                limb: 0.7,
+                pointBlank: 1.5,
+                longRange: 0.6
+            },
+            suppressionThreshold: 3
+        };
+
+        const HEALTH_SYSTEM = {
+            bodyParts: ['head', 'torso', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'],
+            conditions: {
+                healthy: { name: 'Sain', penalties: {} },
+                wounded: { name: 'Blessé', penalties: { accuracy: -10, movement: -5 } },
+                critical: { name: 'Critique', penalties: { accuracy: -30, movement: -20, actionCost: 1.5 } },
+                unconscious: { name: 'Inconscient', penalties: { immobile: true } },
+                dead: { name: 'Mort', penalties: { immobile: true, gameOver: true } }
+            },
+            bleedingRate: 5,
+            infectionChance: 0.02,
+            recoveryRate: 2
+        };
+
+        const CAREER_PROGRESSION = [
+            { experience: 0, title: 'Recrue', bonusSkills: { rifle: 0 } },
+            { experience: 100, title: 'Soldat Expérimenté', bonusSkills: { rifle: 5, tactics: 2 } },
+            { experience: 300, title: 'Vétéran', bonusSkills: { rifle: 10, tactics: 5, survival: 5 } },
+            { experience: 600, title: 'Guerrier Aguerri', bonusSkills: { rifle: 15, tactics: 10, leadership: 5 } },
+            { experience: 1000, title: 'Héros du Reich', bonusSkills: { rifle: 20, tactics: 15, leadership: 10 } }
+        ];
+
+        // ============================================
+        // SECTION 2: ÉTAT DU JEU
+        // ============================================
+
+        let gameState = {
+            character: {
+                name: '',
+                birthDate: '',
+                branch: '',
+                unit: '',
+                role: '',
+                rank: 0,
+                experience: 0,
+                age: 0,
+                combatsParticipated: 0,
+                killCount: 0,
+                timesWounded: 0,
+                health: {
+                    head: 100,
+                    torso: 100,
+                    leftArm: 100,
+                    rightArm: 100,
+                    leftLeg: 100,
+                    rightLeg: 100
+                },
+                conditions: {
+                    bleeding: false,
+                    infected: false,
+                    shellShock: false,
+                    hypothermia: false
+                },
+                stress: 0,
+                morale: 50,
+                ideology: 50,
+                loyalty: 50,
+                skills: {
+                    rifle: 10,
+                    melee: 5,
+                    tactics: 5,
+                    mechanics: 5,
+                    leadership: 5,
+                    survival: 5,
+                    discipline: 10,
+                    endurance: 10
+                },
+                decorations: [],
+                inventory: [],
+                mutations: [],
+                relationships: {}
+            },
+            game: {
+                currentDate: new Date('1933-01-30'),
+                gameState: 'CHARACTER_CREATION',
+                eventIndex: 0,
+                daysPassed: 0,
+                combatActive: false,
+                combatState: {
+                    playerPosition: { x: 2, y: 2 },
+                    enemies: [],
+                    terrain: [],
+                    actionPoints: 10,
+                    round: 0
+                },
+                journal: []
+            }
+        };
+
+        // ============================================
+        // SECTION 3: MOTEUR DE RENDU (UI)
+        // ============================================
+
+        const RenderEngine = {
+            formatDate: function(date) {
+                const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+            },
+
+            updateDateDisplay: function() {
+                document.getElementById('date-display').textContent = this.formatDate(gameState.game.currentDate);
+            },
+
+            renderCharacterCreation: function() {
+                const content = `
+                    <div class="panel" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
+                        <h2>Création de Personnage</h2>
+                        <p style="margin-bottom: 15px;">Bienvenue, soldat. Avant de servir le Reich, nous devons vous connaître.</p>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #d4af37;">Nom:</label>
+                            <input type="text" id="char-name" placeholder="Votre nom" style="width: 100%; padding: 8px; background-color: #0f0f0f; border: 1px solid #555; color: #e8e8e8; border-radius: 3px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #d4af37;">Date de Naissance (YYYY-MM-DD):</label>
+                            <input type="text" id="char-birth" placeholder="1910-01-01" style="width: 100%; padding: 8px; background-color: #0f0f0f; border: 1px solid #555; color: #e8e8e8; border-radius: 3px;">
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #d4af37;">Branche Militaire:</label>
+                            <select id="char-branch" style="width: 100%; padding: 8px; background-color: #0f0f0f; border: 1px solid #555; color: #e8e8e8; border-radius: 3px;">
+                                <option value="">-- Choisir --</option>
+                                <option value="heer">Heer (Armée de Terre)</option>
+                                <option value="luftwaffe">Luftwaffe (Armée de l'Air)</option>
+                                <option value="kriegsmarine">Kriegsmarine (Marine)</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-bottom: 15px;">
+                            <label style="display: block; margin-bottom: 5px; color: #d4af37;">Parcours Éducatif:</label>
+                            <select id="char-education" style="width: 100%; padding: 8px; background-color: #0f0f0f; border: 1px solid #555; color: #e8e8e8; border-radius: 3px;">
+                                <option value="">-- Choisir --</option>
+                                <option value="technical">Apprentissage Technique</option>
+                                <option value="university">Études Universitaires</option>
+                                <option value="none">Aucune Étude</option>
+                            </select>
+                        </div>
+
+                        <button onclick="GameEngine.createCharacter()" style="width: 100%; margin-top: 20px;">Commencer la Simulation</button>
+                    </div>
+                `;
+                document.getElementById('main-content').innerHTML = content;
+            },
+
+            renderHub: function() {
+                const char = gameState.character;
+                const totalHealth = Object.values(char.health).reduce((a, b) => a + b, 0) / 6;
+                
+                const content = `
+                    <div class="panel">
+                        <h2>Dossier Militaire</h2>
+                        <div class="stat-row">
+                            <span class="stat-label">Nom:</span>
+                            <span class="stat-value">${char.name}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Grade:</span>
+                            <span class="stat-value">${char.rank > 0 ? RANKS_DB[char.branch][char.rank - 1].title : 'N/A'}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Unité:</span>
+                            <span class="stat-value">${char.unit || 'Non affecté'}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Rôle:</span>
+                            <span class="stat-value">${char.role || 'N/A'}</span>
+                        </div>
+                        <h3>Santé</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Général:</span>
+                            <span class="stat-value">${Math.round(totalHealth)}%</span>
+                        </div>
+                        <div class="health-bar">
+                            <div class="health-fill" style="width: ${totalHealth}%"></div>
+                        </div>
+                        <h3>État Mental</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Moral:</span>
+                            <span class="stat-value">${char.morale}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Stress:</span>
+                            <span class="stat-value">${char.stress}</span>
+                        </div>
+                        <h3>Compétences</h3>
+                        <div class="stat-row">
+                            <span class="stat-label">Tir:</span>
+                            <span class="stat-value">${char.skills.rifle}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Tactique:</span>
+                            <span class="stat-value">${char.skills.tactics}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Survie:</span>
+                            <span class="stat-value">${char.skills.survival}</span>
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Journal de Marche</h2>
+                        <div class="scrollable">
+                            ${this.getJournalEntries()}
+                        </div>
+                    </div>
+
+                    <div class="panel">
+                        <h2>Situation Stratégique</h2>
+                        <div class="stat-row">
+                            <span class="stat-label">Front Actif:</span>
+                            <span class="stat-value">${this.getCurrentFront()}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Situation:</span>
+                            <span class="stat-value">${this.getSituation()}</span>
+                        </div>
+                        <h3>Événements Récents</h3>
+                        ${this.getRecentEvents()}
+                    </div>
+                `;
+                document.getElementById('main-content').innerHTML = content;
+            },
+
+            getJournalEntries: function() {
+                const events = HISTORICAL_EVENTS.filter(e => new Date(e.date) <= gameState.game.currentDate).slice(-5);
+                return events.map(e => `
+                    <div class="journal-entry">
+                        <div class="journal-date">${RenderEngine.formatDate(new Date(e.date))}</div>
+                        <div class="journal-text"><strong>${e.title}</strong><br>${e.description}</div>
+                    </div>
+                `).join('');
+            },
+
+            getRecentEvents: function() {
+                const events = HISTORICAL_EVENTS.filter(e => new Date(e.date) <= gameState.game.currentDate).slice(-3);
+                return events.map(e => `<div class="stat-row"><span class="stat-label">${e.title}</span></div>`).join('');
+            },
+
+            getCurrentFront: function() {
+                const date = gameState.game.currentDate;
+                if (date < new Date('1939-09-01')) return 'Aucun (Paix)';
+                if (date < new Date('1940-05-10')) return 'Pologne';
+                if (date < new Date('1941-06-22')) return 'France';
+                if (date < new Date('1944-06-06')) return 'Front de l\'Est';
+                return 'Défense du Reich';
+            },
+
+            getSituation: function() {
+                const date = gameState.game.currentDate;
+                if (date < new Date('1939-09-01')) return 'Paix relative';
+                if (date < new Date('1943-02-02')) return 'Offensives allemandes';
+                if (date < new Date('1944-06-06')) return 'Stagnation';
+                return 'Retraite générale';
+            },
+
+            update: function() {
+                this.updateDateDisplay();
+                switch(gameState.game.gameState) {
+                    case 'CHARACTER_CREATION':
+                        this.renderCharacterCreation();
+                        break;
+                    case 'HUB':
+                        this.renderHub();
+                        break;
+                    case 'COMBAT':
+                        this.renderCombat();
+                        break;
+                }
+            },
+
+            renderCombat: function() {
+                const content = `
+                    <div class="panel" style="grid-column: 1 / -1;">
+                        <h2>Combat Tactique</h2>
+                        <div class="combat-grid" id="combat-grid"></div>
+                        <div style="margin-top: 15px;">
+                            <button onclick="GameEngine.endCombat()">Fin du Combat</button>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('main-content').innerHTML = content;
+                this.generateCombatGrid();
+            },
+
+            generateCombatGrid: function() {
+                const grid = document.getElementById('combat-grid');
+                grid.innerHTML = '';
+                for (let i = 0; i < 64; i++) {
+                    const tile = document.createElement('div');
+                    tile.className = 'combat-tile';
+                    if (i === 10) tile.className += ' player';
+                    if (i === 50) tile.className += ' enemy';
+                    if ([20, 21, 35, 36].includes(i)) tile.className += ' cover';
+                    tile.textContent = i;
+                    grid.appendChild(tile);
+                }
+            }
+        };
+
+        // ============================================
+        // SECTION 4: MOTEUR DE JEU
+        // ============================================
+
+        // ============================================
+        // SECTION 4B: SYSTÈMES AVANCÉS
+        // ============================================
+
+        const CombatSystem = {
+            calculateHitChance: function(attacker, defender, distance) {
+                let accuracy = attacker.skills.rifle + (Math.random() * 20 - 10);
+                accuracy *= (1 - (distance / 1000)); // Réduction avec la distance
+                accuracy *= (1 - (attacker.stress / 100)); // Réduction avec le stress
+                return Math.max(5, Math.min(95, accuracy));
+            },
+
+            calculateDamage: function(weapon, hitLocation, distance) {
+                let damage = weapon.damage || 30;
+                let modifier = COMBAT_SYSTEM.damageModifiers[hitLocation] || 1.0;
+                if (distance < 50) modifier *= COMBAT_SYSTEM.damageModifiers.pointBlank;
+                if (distance > 400) modifier *= COMBAT_SYSTEM.damageModifiers.longRange;
+                return Math.round(damage * modifier);
+            },
+
+            resolveAttack: function(attacker, defender, weapon, distance) {
+                const hitChance = this.calculateHitChance(attacker, defender, distance);
+                const roll = Math.random() * 100;
+                
+                if (roll < hitChance) {
+                    const hitLocations = ['head', 'torso', 'leftArm', 'rightArm', 'leftLeg', 'rightLeg'];
+                    const location = hitLocations[Math.floor(Math.random() * hitLocations.length)];
+                    const damage = this.calculateDamage(weapon, location, distance);
+                    return { hit: true, location: location, damage: damage };
+                }
+                return { hit: false };
+            },
+
+            applyDamage: function(character, location, damage) {
+                character.health[location] -= damage;
+                if (character.health[location] < 0) character.health[location] = 0;
+                
+                if (character.health[location] <= 0) {
+                    character.conditions.bleeding = true;
+                    character.timesWounded++;
+                }
+            }
+        };
+
+        const HealthSystem = {
+            getOverallHealth: function(character) {
+                const total = Object.values(character.health).reduce((a, b) => a + b, 0);
+                return total / 6;
+            },
+
+            getCondition: function(character) {
+                const health = this.getOverallHealth(character);
+                if (health >= 80) return 'healthy';
+                if (health >= 50) return 'wounded';
+                if (health >= 20) return 'critical';
+                if (health > 0) return 'unconscious';
+                return 'dead';
+            },
+
+            applyBleeding: function(character) {
+                if (character.conditions.bleeding) {
+                    character.health.torso -= HEALTH_SYSTEM.bleedingRate;
+                    if (character.health.torso < 0) character.health.torso = 0;
+                }
+            },
+
+            checkInfection: function(character) {
+                if (character.timesWounded > 0 && Math.random() < HEALTH_SYSTEM.infectionChance) {
+                    character.conditions.infected = true;
+                }
+            },
+
+            recover: function(character) {
+                Object.keys(character.health).forEach(part => {
+                    if (character.health[part] < 100) {
+                        character.health[part] = Math.min(100, character.health[part] + HEALTH_SYSTEM.recoveryRate);
+                    }
+                });
+            }
+        };
+
+        const CareerSystem = {
+            gainExperience: function(character, amount) {
+                character.experience += amount;
+                this.checkPromotion(character);
+            },
+
+            checkPromotion: function(character) {
+                const ranks = RANKS_DB[character.branch];
+                if (character.rank < ranks.length) {
+                    const nextRank = ranks[character.rank];
+                    if (character.experience >= nextRank.id * 100) {
+                        character.rank++;
+                        GameEngine.addJournalEntry(`Promotion! Vous êtes maintenant ${nextRank.title}`);
+                    }
+                }
+            },
+
+            getCareerTitle: function(character) {
+                for (let i = CAREER_PROGRESSION.length - 1; i >= 0; i--) {
+                    if (character.experience >= CAREER_PROGRESSION[i].experience) {
+                        return CAREER_PROGRESSION[i].title;
+                    }
+                }
+                return 'Recrue';
+            },
+
+            awardDecoration: function(character, decorationId) {
+                const decoration = DECORATIONS.find(d => d.id === decorationId);
+                if (decoration && !character.decorations.includes(decorationId)) {
+                    character.decorations.push(decorationId);
+                    if (decoration.effect) {
+                        if (decoration.effect.morale) character.morale += decoration.effect.morale;
+                    }
+                    GameEngine.addJournalEntry(`Décoration reçue: ${decoration.name}`);
+                }
+            }
+        };
+
+        // ============================================
+        // SECTION 4: MOTEUR DE JEU
+        // ============================================
+
+        const GameEngine = {
+            addJournalEntry: function(text) {
+                gameState.game.journal.push({
+                    date: RenderEngine.formatDate(gameState.game.currentDate),
+                    text: text
+                });
+            },
+
+            createCharacter: function() {
+                const name = document.getElementById('char-name').value;
+                const birth = document.getElementById('char-birth').value;
+                const branch = document.getElementById('char-branch').value;
+                const education = document.getElementById('char-education').value;
+
+                if (!name || !birth || !branch || !education) {
+                    alert('Veuillez remplir tous les champs.');
+                    return;
+                }
+
+                gameState.character.name = name;
+                gameState.character.birthDate = birth;
+                gameState.character.branch = branch;
+                gameState.game.gameState = 'HUB';
+
+                // Appliquer les bonus d'éducation
+                if (education === 'technical') {
+                    gameState.character.skills.mechanics += 15;
+                } else if (education === 'university') {
+                    gameState.character.skills.tactics += 15;
+                }
+
+                // Affecter une unité et un rôle
+                const branchData = MILITARY_BRANCHES[branch];
+                const unit = branchData.units[0];
+                const role = branchData.roles[0];
+                gameState.character.unit = unit.name;
+                gameState.character.role = role.name;
+                gameState.character.rank = 1; // Soldat de base
+
+                RenderEngine.update();
+            },
+
+            advanceTime: function() {
+                const currentDate = gameState.game.currentDate;
+                const nextDate = new Date(currentDate);
+
+                // Avancer d'un mois en paix, d'un jour en guerre
+                if (currentDate < new Date('1939-09-01')) {
+                    nextDate.setMonth(nextDate.getMonth() + 1);
+                } else {
+                    nextDate.setDate(nextDate.getDate() + 1);
+                }
+
+                gameState.game.currentDate = nextDate;
+                gameState.game.daysPassed++;
+
+                // Vérifier les événements historiques
+                this.checkHistoricalEvents();
+
+                // Appliquer les effets du temps
+                this.applyTimeEffects();
+
+                RenderEngine.update();
+            },
+
+            checkHistoricalEvents: function() {
+                const dateStr = gameState.game.currentDate.toISOString().split('T')[0];
+                const event = HISTORICAL_EVENTS.find(e => e.date === dateStr);
+
+                if (event && gameState.game.eventIndex <= HISTORICAL_EVENTS.indexOf(event)) {
+                    gameState.game.eventIndex = HISTORICAL_EVENTS.indexOf(event) + 1;
+                    this.showEvent(event);
+                }
+            },
+
+            showEvent: function(event) {
+                const modal = document.getElementById('event-modal');
+                document.getElementById('event-title').textContent = event.title;
+                document.getElementById('event-text').innerHTML = `<p>${event.description}</p>`;
+                
+                // Appliquer les effets
+                if (event.effects) {
+                    if (event.effects.morale) gameState.character.morale += event.effects.morale;
+                    if (event.effects.ideology) gameState.character.ideology += event.effects.ideology;
+                    if (event.effects.state === 'COMBAT') gameState.game.gameState = 'COMBAT';
+                }
+
+                document.getElementById('event-choices').innerHTML = '<button onclick="document.getElementById(\'event-modal\').classList.remove(\'active\')">Continuer</button>';
+                modal.classList.add('active');
+            },
+
+            applyTimeEffects: function() {
+                // Récupération du stress
+                if (gameState.character.stress > 0) {
+                    gameState.character.stress = Math.max(0, gameState.character.stress - 1);
+                }
+                // Amélioration des compétences
+                if (Math.random() < 0.1) {
+                    gameState.character.skills.rifle += 0.1;
+                }
+            },
+
+            endCombat: function() {
+                gameState.game.gameState = 'HUB';
+                gameState.game.combatActive = false;
+                // Appliquer les dégâts et les effets du combat
+                gameState.character.stress += 10;
+                gameState.character.morale -= 5;
+                RenderEngine.update();
+            },
+
+            saveGame: function() {
+                localStorage.setItem('eisernes_kreuz_save', JSON.stringify(gameState));
+                alert('Partie sauvegardée!');
+            },
+
+            loadGame: function() {
+                const save = localStorage.getItem('eisernes_kreuz_save');
+                if (save) {
+                    gameState = JSON.parse(save);
+                    RenderEngine.update();
+                } else {
+                    alert('Aucune sauvegarde trouvée.');
+                }
+            }
+        };
+
+        // ============================================
+        // SECTION 5: INITIALISATION
+        // ============================================
+
+        document.getElementById('continue-button').addEventListener('click', () => GameEngine.advanceTime());
+        document.getElementById('save-button').addEventListener('click', () => GameEngine.saveGame());
+        document.getElementById('load-button').addEventListener('click', () => GameEngine.loadGame());
+
+        window.addEventListener('load', () => {
+            RenderEngine.update();
+        });
+    </script>
+</body>
+</html>

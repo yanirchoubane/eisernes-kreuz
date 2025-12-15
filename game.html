@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1a1a1a">
+    <title>Eisernes Kreuz – Simulation Totale</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Georgia', serif; background-color: #0a0a0a; color: #e8e8e8; line-height: 1.6; overflow: hidden; }
+        #game-container { width: 100vw; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%); }
+        .header { background-color: #1a1a1a; border-bottom: 2px solid #8b0000; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.8); }
+        .header h1 { font-size: 24px; font-weight: bold; letter-spacing: 2px; color: #d4af37; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.9); }
+        .date-display { font-size: 16px; color: #a8a8a8; font-style: italic; }
+        .main-content { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 15px; padding: 15px; overflow: hidden; }
+        .panel { background-color: #1a1a1a; border: 1px solid #444; border-radius: 4px; padding: 15px; overflow-y: auto; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5); }
+        .panel h2 { color: #d4af37; margin-bottom: 12px; border-bottom: 1px solid #555; padding-bottom: 8px; font-size: 16px; letter-spacing: 1px; }
+        .panel h3 { color: #a8a8a8; margin-top: 12px; margin-bottom: 6px; font-size: 14px; }
+        .stat-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #333; font-size: 13px; }
+        .stat-label { color: #a8a8a8; }
+        .stat-value { color: #e8e8e8; font-weight: bold; }
+        .journal-entry { background-color: #0f0f0f; border-left: 3px solid #8b0000; padding: 10px; margin-bottom: 10px; border-radius: 2px; font-size: 13px; line-height: 1.5; }
+        .journal-date { color: #d4af37; font-weight: bold; font-size: 12px; margin-bottom: 4px; }
+        .journal-text { color: #c8c8c8; }
+        .footer { background-color: #1a1a1a; border-top: 2px solid #8b0000; padding: 12px 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        button { background-color: #8b0000; color: #e8e8e8; border: 1px solid #d4af37; padding: 10px 20px; font-size: 14px; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; font-weight: bold; letter-spacing: 1px; }
+        button:hover { background-color: #a00000; box-shadow: 0 0 10px rgba(212, 175, 55, 0.5); }
+        button:active { transform: scale(0.98); }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-content { background-color: #1a1a1a; border: 2px solid #8b0000; padding: 30px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border-radius: 4px; box-shadow: 0 0 20px rgba(139, 0, 0, 0.8); }
+        .modal-content h2 { color: #d4af37; margin-bottom: 15px; font-size: 20px; }
+        .modal-content p { margin-bottom: 12px; color: #c8c8c8; line-height: 1.6; }
+        .choice-button { display: block; width: 100%; margin-top: 10px; text-align: left; padding: 12px; background-color: #0f0f0f; border: 1px solid #555; color: #e8e8e8; cursor: pointer; border-radius: 3px; transition: all 0.3s ease; }
+        .choice-button:hover { background-color: #2a2a2a; border-color: #d4af37; color: #d4af37; }
+        .health-bar { width: 100%; height: 20px; background-color: #0f0f0f; border: 1px solid #555; border-radius: 2px; overflow: hidden; margin: 5px 0; }
+        .health-fill { height: 100%; background: linear-gradient(90deg, #00aa00 0%, #aaaa00 50%, #aa0000 100%); width: 100%; transition: width 0.3s ease; }
+        .scrollable { overflow-y: auto; max-height: calc(100% - 50px); }
+        input, select { width: 100%; padding: 8px; background-color: #0f0f0f; border: 1px solid #555; color: #e8e8e8; border-radius: 3px; margin-bottom: 10px; font-family: inherit; }
+        label { display: block; color: #d4af37; margin-bottom: 5px; font-weight: bold; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f0f0f; }
+        ::-webkit-scrollbar-thumb { background: #8b0000; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a00000; }
+        @media (max-width: 1200px) { .main-content { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div class="header">
+            <h1>⚔ EISERNES KREUZ ⚔</h1>
+            <div class="date-display" id="date-display">30 Janvier 1933</div>
+        </div>
+        <div class="main-content" id="main-content"></div>
+        <div class="footer">
+            <button id="continue-button">Continuer</button>
+            <button id="save-button">Sauvegarder</button>
+            <button id="load-button">Charger</button>
+        </div>
+    </div>
+
+    <div id="event-modal" class="modal">
+        <div class="modal-content">
+            <h2 id="event-title">Événement</h2>
+            <div id="event-text"></div>
+            <div id="event-choices"></div>
+        </div>
+    </div>
+
+    <script>
+        // ============ BASES DE DONNÉES COMPLÈTES ============
+        const RANKS_DB = {
+            heer: [
+                { id: 1, title: 'Schütze', pay: 78, authority: 0, description: 'Soldat d\'infanterie de base' },
+                { id: 2, title: 'Gefreiter', pay: 95, authority: 1, description: 'Soldat de première classe' },
+                { id: 3, title: 'Unteroffizier', pay: 130, authority: 2, description: 'Sous-officier' },
+                { id: 4, title: 'Feldwebel', pay: 170, authority: 3, description: 'Sergent' },
+                { id: 5, title: 'Leutnant', pay: 250, authority: 5, description: 'Officier subalterne' },
+                { id: 6, title: 'Hauptmann', pay: 350, authority: 7, description: 'Capitaine' },
+                { id: 7, title: 'Major', pay: 450, authority: 8, description: 'Commandant' }
+            ],
+            luftwaffe: [
+                { id: 1, title: 'Flieger', pay: 78, authority: 0, description: 'Aviateur' },
+                { id: 2, title: 'Gefreiter', pay: 95, authority: 1, description: 'Aviateur de première classe' },
+                { id: 3, title: 'Unteroffizier', pay: 130, authority: 2, description: 'Sous-officier' },
+                { id: 4, title: 'Feldwebel', pay: 170, authority: 3, description: 'Sergent' },
+                { id: 5, title: 'Leutnant', pay: 250, authority: 5, description: 'Officier subalterne' }
+            ],
+            kriegsmarine: [
+                { id: 1, title: 'Matrose', pay: 78, authority: 0, description: 'Matelot' },
+                { id: 2, title: 'Obermatrose', pay: 95, authority: 1, description: 'Matelot de première classe' },
+                { id: 3, title: 'Bootsmannsmaat', pay: 130, authority: 2, description: 'Maître d\'équipage' },
+                { id: 4, title: 'Leutnant zur See', pay: 250, authority: 5, description: 'Enseigne de vaisseau' }
+            ]
+        };
+
+        const MILITARY_BRANCHES = {
+            heer: {
+                name: 'Heer',
+                description: 'Armée de Terre',
+                units: [
+                    { id: 'gd', name: 'Infanterie-Regiment Großdeutschland', type: 'Élite', size: 3000 },
+                    { id: '291id', name: '291. Infanterie-Division', type: 'Standard', size: 15000 },
+                    { id: '2pz', name: '2. Panzer-Division', type: 'Blindée', size: 12000 },
+                    { id: '6armee', name: '6. Armee', type: 'Armée', size: 250000 },
+                    { id: 'dak', name: 'Deutsches Afrikakorps', type: 'Spécialisée', size: 100000 }
+                ],
+                roles: [
+                    { id: 'rifleman', name: 'Fusilier', description: 'Infanterie légère' },
+                    { id: 'grenadier', name: 'Grenadier', description: 'Infanterie de choc' },
+                    { id: 'mg', name: 'Mitrailleur', description: 'Opérateur MG42' },
+                    { id: 'sniper', name: 'Sniper', description: 'Tireur d\'élite' },
+                    { id: 'engineer', name: 'Pionnier', description: 'Sapeur' },
+                    { id: 'tank_driver', name: 'Pilote de Char', description: 'Conducteur de Panzer' },
+                    { id: 'officer', name: 'Officier', description: 'Commandant' }
+                ]
+            },
+            luftwaffe: {
+                name: 'Luftwaffe',
+                description: 'Armée de l\'Air',
+                units: [
+                    { id: 'jg2', name: 'JG 2 "Richthofen"', type: 'Chasse', size: 1200 },
+                    { id: 'jg52', name: 'JG 52', type: 'Chasse', size: 1200 },
+                    { id: 'kg51', name: 'KG 51 "Edelweiss"', type: 'Bombardement', size: 1500 }
+                ],
+                roles: [
+                    { id: 'fighter_pilot', name: 'Pilote de Chasse', description: 'Chasseur aérien' },
+                    { id: 'bomber_pilot', name: 'Pilote de Bombardier', description: 'Bombardier' },
+                    { id: 'gunner', name: 'Mitrailleur', description: 'Artilleur de bord' },
+                    { id: 'mechanic', name: 'Mécanicien', description: 'Maintenance aéronautique' }
+                ]
+            },
+            kriegsmarine: {
+                name: 'Kriegsmarine',
+                description: 'Marine de Guerre',
+                units: [
+                    { id: '7uflottille', name: '7. U-Flottille', type: 'Sous-marine', size: 50 },
+                    { id: 'hochseeflotte', name: 'Hochseeflotte', type: 'Surface', size: 200 }
+                ],
+                roles: [
+                    { id: 'u_boat_captain', name: 'Commandant U-Boot', description: 'Capitaine de sous-marin' },
+                    { id: 'u_boat_crew', name: 'Équipage U-Boot', description: 'Marin sous-marinier' },
+                    { id: 'surface_crew', name: 'Équipage Surface', description: 'Marin de surface' }
+                ]
+            }
+        };
+
+        const HISTORICAL_EVENTS = [
+            { date: '1933-01-30', title: 'Prise de pouvoir d\'Hitler', description: 'Hitler est nommé chancelier du Reich allemand. Début du Troisième Reich.', effects: { morale: 5, ideology: 10 } },
+            { date: '1933-03-23', title: 'Loi des pleins pouvoirs', description: 'Le Reichstag vote la loi des pleins pouvoirs, donnant à Hitler le pouvoir absolu.', effects: { ideology: 5 } },
+            { date: '1935-03-16', title: 'Réarmement de l\'Allemagne', description: 'L\'Allemagne annonce son réarmement, violant le Traité de Versailles.', effects: { morale: 10 } },
+            { date: '1936-07-17', title: 'Guerre d\'Espagne', description: 'La Légion Condor allemande intervient en Espagne aux côtés de Franco.', effects: { morale: 5 } },
+            { date: '1938-03-12', title: 'Anschluss', description: 'L\'Allemagne annexe l\'Autriche. Pas de résistance. Acclamations à Vienne.', effects: { morale: 15, ideology: 5 } },
+            { date: '1938-09-01', title: 'Crise des Sudètes', description: 'Les Accords de Munich livrent les Sudètes à l\'Allemagne sans combat.', effects: { morale: 10 } },
+            { date: '1939-09-01', title: 'Invasion de la Pologne', description: 'L\'Allemagne envahit la Pologne. Début de la Seconde Guerre mondiale. Les Alliés déclarent la guerre.', effects: { morale: -5, state: 'COMBAT' } },
+            { date: '1940-05-10', title: 'Campagne de l\'Ouest', description: 'L\'Allemagne envahit la Belgique, les Pays-Bas et la France. Blitzkrieg!', effects: { morale: 10 } },
+            { date: '1940-06-22', title: 'Armistice français', description: 'La France capitule. L\'Allemagne occupe Paris. Victoire totale à l\'Ouest.', effects: { morale: 20 } },
+            { date: '1941-06-22', title: 'Opération Barbarossa', description: 'L\'Allemagne envahit l\'Union soviétique. Début de la Guerre à l\'Est. Trois millions de soldats lancés.', effects: { morale: -10, state: 'COMBAT' } },
+            { date: '1941-12-11', title: 'Déclaration de guerre aux USA', description: 'L\'Allemagne déclare la guerre aux États-Unis. La guerre devient véritablement mondiale.', effects: { morale: -15 } },
+            { date: '1942-08-23', title: 'Bataille de Stalingrad', description: 'Début de la bataille de Stalingrad. Combat urbain intense et meurtrier. La 6e Armée s\'engage.', effects: { morale: -20, state: 'COMBAT' } },
+            { date: '1942-11-23', title: 'Encerclement à Stalingrad', description: 'La 6e Armée est encerclée par les Soviétiques. Situation désespérée.', effects: { morale: -30 } },
+            { date: '1943-02-02', title: 'Capitulation de Stalingrad', description: 'La 6e Armée capitule après des mois de combat. Fin de la bataille de Stalingrad. Tournant de la guerre.', effects: { morale: -40 } },
+            { date: '1943-07-05', title: 'Bataille de Koursk', description: 'Début de la plus grande bataille de chars de l\'histoire. Offensive allemande contre les Soviétiques.', effects: { morale: -10, state: 'COMBAT' } },
+            { date: '1943-07-12', title: 'Bataille de Prokhorovka', description: 'Engagement massif de blindés. Les Allemands ne peuvent pas percer.', effects: { morale: -15 } },
+            { date: '1944-06-06', title: 'Débarquement de Normandie', description: 'Les Alliés débarquent en Normandie. Début de la libération de l\'Europe de l\'Ouest. Opération Overlord.', effects: { morale: -25 } },
+            { date: '1944-07-20', title: 'Attentat contre Hitler', description: 'Des officiers allemands tentent d\'assassiner Hitler. L\'attentat échoue. Répression massive.', effects: { morale: -10, ideology: -10 } },
+            { date: '1945-01-12', title: 'Offensive soviétique finale', description: 'L\'Armée Rouge lance son offensive finale vers l\'Allemagne. Vistule-Oder.', effects: { morale: -40 } },
+            { date: '1945-04-30', title: 'Suicide d\'Hitler', description: 'Hitler se suicide dans son bunker à Berlin. Fin du Führer.', effects: { morale: -50 } },
+            { date: '1945-05-08', title: 'Capitulation inconditionnelle', description: 'L\'Allemagne capitule sans condition. Fin de la Seconde Guerre mondiale en Europe.', effects: { morale: -100, state: 'ENDED' } }
+        ];
+
+        const DECORATIONS = [
+            { id: 'ekii', name: 'Croix de Fer 2e Classe', description: 'Décoration pour acte de bravoure', effect: { morale: 10 } },
+            { id: 'eki', name: 'Croix de Fer 1ère Classe', description: 'Décoration supérieure pour bravoure exceptionnelle', effect: { morale: 20 } },
+            { id: 'knight', name: 'Croix de Chevalier', description: 'Plus haute décoration pour commandement et bravoure', effect: { morale: 50 } },
+            { id: 'wound', name: 'Insigne des Blessés', description: 'Décoration pour blessure au combat', effect: { morale: 5 } }
+        ];
+
+        const CAREER_PROGRESSION = [
+            { experience: 0, title: 'Recrue', description: 'Tout juste incorporé' },
+            { experience: 100, title: 'Soldat Expérimenté', description: 'Quelques mois de service' },
+            { experience: 300, title: 'Vétéran', description: 'Plusieurs années de combat' },
+            { experience: 600, title: 'Guerrier Aguerri', description: 'Survivant de nombreuses batailles' },
+            { experience: 1000, title: 'Héros du Reich', description: 'Légende vivante du front' }
+        ];
+
+        // ============ ÉTAT DU JEU ============
+        let gameState = {
+            character: {
+                name: '', birthDate: '', branch: '', unit: '', role: '', rank: 0, experience: 0,
+                health: { head: 100, torso: 100, leftArm: 100, rightArm: 100, leftLeg: 100, rightLeg: 100 },
+                stress: 0, morale: 50, ideology: 50, loyalty: 50,
+                skills: { rifle: 10, melee: 5, tactics: 5, mechanics: 5, leadership: 5, survival: 5 },
+                decorations: [], combatsParticipated: 0, killCount: 0, timesWounded: 0
+            },
+            game: {
+                currentDate: new Date('1933-01-30'),
+                gameState: 'CHARACTER_CREATION',
+                eventIndex: 0,
+                daysPassed: 0,
+                journal: []
+            }
+        };
+
+        // ============ SYSTÈMES AVANCÉS ============
+        const HealthSystem = {
+            getOverallHealth() {
+                const total = Object.values(gameState.character.health).reduce((a, b) => a + b, 0);
+                return total / 6;
+            },
+            getCondition() {
+                const health = this.getOverallHealth();
+                if (health >= 80) return 'Sain';
+                if (health >= 50) return 'Blessé';
+                if (health >= 20) return 'Critique';
+                return 'Mourant';
+            },
+            applyDamage(location, amount) {
+                gameState.character.health[location] = Math.max(0, gameState.character.health[location] - amount);
+                if (gameState.character.health[location] === 0) {
+                    gameState.character.timesWounded++;
+                }
+            }
+        };
+
+        const CareerSystem = {
+            getCareerTitle() {
+                for (let i = CAREER_PROGRESSION.length - 1; i >= 0; i--) {
+                    if (gameState.character.experience >= CAREER_PROGRESSION[i].experience) {
+                        return CAREER_PROGRESSION[i].title;
+                    }
+                }
+                return 'Recrue';
+            },
+            gainExperience(amount) {
+                const oldTitle = this.getCareerTitle();
+                gameState.character.experience += amount;
+                const newTitle = this.getCareerTitle();
+                if (oldTitle !== newTitle) {
+                    GameEngine.addJournalEntry(`Progression: Vous êtes maintenant ${newTitle}`);
+                }
+            },
+            checkPromotion() {
+                const ranks = RANKS_DB[gameState.character.branch];
+                if (gameState.character.rank < ranks.length && gameState.character.experience % 200 === 0) {
+                    gameState.character.rank++;
+                    GameEngine.addJournalEntry(`Promotion! Vous êtes maintenant ${ranks[gameState.character.rank - 1].title}`);
+                }
+            }
+        };
+
+        // ============ MOTEUR DE RENDU ============
+        const RenderEngine = {
+            formatDate(date) {
+                const months = ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'];
+                return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+            },
+            updateDateDisplay() {
+                document.getElementById('date-display').textContent = this.formatDate(gameState.game.currentDate);
+            },
+            renderCharacterCreation() {
+                const content = `
+                    <div class="panel" style="grid-column: 1 / -1; max-width: 600px; margin: 0 auto;">
+                        <h2>Création de Personnage</h2>
+                        <p style="margin-bottom: 15px;">Bienvenue, soldat. Avant de servir le Reich, nous devons vous connaître.</p>
+                        <label>Nom:</label>
+                        <input type="text" id="char-name" placeholder="Votre nom complet">
+                        <label>Date de Naissance (YYYY-MM-DD):</label>
+                        <input type="text" id="char-birth" placeholder="1910-01-01">
+                        <label>Branche Militaire:</label>
+                        <select id="char-branch">
+                            <option value="">-- Choisir --</option>
+                            <option value="heer">Heer (Armée de Terre)</option>
+                            <option value="luftwaffe">Luftwaffe (Armée de l'Air)</option>
+                            <option value="kriegsmarine">Kriegsmarine (Marine)</option>
+                        </select>
+                        <label>Parcours Éducatif:</label>
+                        <select id="char-education">
+                            <option value="">-- Choisir --</option>
+                            <option value="technical">Apprentissage Technique (+Mécanique)</option>
+                            <option value="university">Études Universitaires (+Tactique)</option>
+                            <option value="none">Aucune Étude</option>
+                        </select>
+                        <button onclick="GameEngine.createCharacter()" style="width: 100%; margin-top: 20px;">Commencer la Simulation</button>
+                    </div>
+                `;
+                document.getElementById('main-content').innerHTML = content;
+            },
+            renderHub() {
+                const char = gameState.character;
+                const totalHealth = HealthSystem.getOverallHealth();
+                const condition = HealthSystem.getCondition();
+                const careerTitle = CareerSystem.getCareerTitle();
+                const rankTitle = char.rank > 0 ? RANKS_DB[char.branch][char.rank - 1].title : 'N/A';
+                
+                const content = `
+                    <div class="panel">
+                        <h2>Dossier Militaire</h2>
+                        <div class="stat-row"><span class="stat-label">Nom:</span><span class="stat-value">${char.name}</span></div>
+                        <div class="stat-row"><span class="stat-label">Grade:</span><span class="stat-value">${rankTitle}</span></div>
+                        <div class="stat-row"><span class="stat-label">Titre:</span><span class="stat-value">${careerTitle}</span></div>
+                        <div class="stat-row"><span class="stat-label">Unité:</span><span class="stat-value">${char.unit || 'Non affecté'}</span></div>
+                        <div class="stat-row"><span class="stat-label">Rôle:</span><span class="stat-value">${char.role || 'N/A'}</span></div>
+                        <div class="stat-row"><span class="stat-label">Expérience:</span><span class="stat-value">${char.experience} pts</span></div>
+                        <h3>Santé</h3>
+                        <div class="stat-row"><span class="stat-label">Général:</span><span class="stat-value">${Math.round(totalHealth)}% (${condition})</span></div>
+                        <div class="health-bar"><div class="health-fill" style="width: ${totalHealth}%"></div></div>
+                        <div class="stat-row"><span class="stat-label">Tête:</span><span class="stat-value">${Math.round(char.health.head)}%</span></div>
+                        <div class="stat-row"><span class="stat-label">Torse:</span><span class="stat-value">${Math.round(char.health.torso)}%</span></div>
+                        <div class="stat-row"><span class="stat-label">Bras Droit:</span><span class="stat-value">${Math.round(char.health.rightArm)}%</span></div>
+                        <div class="stat-row"><span class="stat-label">Bras Gauche:</span><span class="stat-value">${Math.round(char.health.leftArm)}%</span></div>
+                        <h3>État Mental</h3>
+                        <div class="stat-row"><span class="stat-label">Moral:</span><span class="stat-value">${char.morale}/100</span></div>
+                        <div class="stat-row"><span class="stat-label">Stress:</span><span class="stat-value">${char.stress}/100</span></div>
+                        <div class="stat-row"><span class="stat-label">Loyauté:</span><span class="stat-value">${char.loyalty}/100</span></div>
+                        <h3>Compétences</h3>
+                        <div class="stat-row"><span class="stat-label">Tir:</span><span class="stat-value">${Math.round(char.skills.rifle)}</span></div>
+                        <div class="stat-row"><span class="stat-label">Tactique:</span><span class="stat-value">${Math.round(char.skills.tactics)}</span></div>
+                        <div class="stat-row"><span class="stat-label">Survie:</span><span class="stat-value">${Math.round(char.skills.survival)}</span></div>
+                        <div class="stat-row"><span class="stat-label">Mécanique:</span><span class="stat-value">${Math.round(char.skills.mechanics)}</span></div>
+                        <h3>Statistiques</h3>
+                        <div class="stat-row"><span class="stat-label">Combats:</span><span class="stat-value">${char.combatsParticipated}</span></div>
+                        <div class="stat-row"><span class="stat-label">Ennemis tués:</span><span class="stat-value">${char.killCount}</span></div>
+                        <div class="stat-row"><span class="stat-label">Blessures:</span><span class="stat-value">${char.timesWounded}</span></div>
+                    </div>
+                    <div class="panel">
+                        <h2>Journal de Marche</h2>
+                        <div class="scrollable">${this.getJournalEntries()}</div>
+                    </div>
+                    <div class="panel">
+                        <h2>Situation Stratégique</h2>
+                        <div class="stat-row"><span class="stat-label">Front Actif:</span><span class="stat-value">${this.getCurrentFront()}</span></div>
+                        <div class="stat-row"><span class="stat-label">Situation:</span><span class="stat-value">${this.getSituation()}</span></div>
+                        <h3>Événements Récents</h3>${this.getRecentEvents()}
+                    </div>
+                `;
+                document.getElementById('main-content').innerHTML = content;
+            },
+            getJournalEntries() {
+                const events = HISTORICAL_EVENTS.filter(e => new Date(e.date) <= gameState.game.currentDate).slice(-5);
+                return events.map(e => `
+                    <div class="journal-entry">
+                        <div class="journal-date">${this.formatDate(new Date(e.date))}</div>
+                        <div class="journal-text"><strong>${e.title}</strong><br>${e.description}</div>
+                    </div>
+                `).join('');
+            },
+            getRecentEvents() {
+                const events = HISTORICAL_EVENTS.filter(e => new Date(e.date) <= gameState.game.currentDate).slice(-3);
+                return events.map(e => `<div class="stat-row"><span class="stat-label">${e.title}</span></div>`).join('');
+            },
+            getCurrentFront() {
+                const date = gameState.game.currentDate;
+                if (date < new Date('1939-09-01')) return 'Aucun (Paix)';
+                if (date < new Date('1940-05-10')) return 'Pologne';
+                if (date < new Date('1941-06-22')) return 'France & Balkans';
+                if (date < new Date('1944-06-06')) return 'Front de l\'Est';
+                return 'Défense du Reich';
+            },
+            getSituation() {
+                const date = gameState.game.currentDate;
+                if (date < new Date('1939-09-01')) return 'Paix relative';
+                if (date < new Date('1943-02-02')) return 'Offensives allemandes';
+                if (date < new Date('1944-06-06')) return 'Stagnation';
+                return 'Retraite générale';
+            },
+            update() {
+                this.updateDateDisplay();
+                switch(gameState.game.gameState) {
+                    case 'CHARACTER_CREATION': this.renderCharacterCreation(); break;
+                    case 'HUB': this.renderHub(); break;
+                }
+            }
+        };
+
+        // ============ MOTEUR DE JEU ============
+        const GameEngine = {
+            addJournalEntry(text) {
+                gameState.game.journal.push({ date: RenderEngine.formatDate(gameState.game.currentDate), text: text });
+            },
+            createCharacter() {
+                const name = document.getElementById('char-name').value;
+                const birth = document.getElementById('char-birth').value;
+                const branch = document.getElementById('char-branch').value;
+                const education = document.getElementById('char-education').value;
+
+                if (!name || !birth || !branch || !education) {
+                    alert('Veuillez remplir tous les champs.');
+                    return;
+                }
+
+                gameState.character.name = name;
+                gameState.character.birthDate = birth;
+                gameState.character.branch = branch;
+                gameState.game.gameState = 'HUB';
+
+                if (education === 'technical') gameState.character.skills.mechanics += 15;
+                else if (education === 'university') gameState.character.skills.tactics += 15;
+
+                const branchData = MILITARY_BRANCHES[branch];
+                gameState.character.unit = branchData.units[0].name;
+                gameState.character.role = branchData.roles[0].name;
+                gameState.character.rank = 1;
+
+                this.addJournalEntry(`Incorporation dans la ${branchData.description}`);
+                RenderEngine.update();
+            },
+            advanceTime() {
+                const currentDate = gameState.game.currentDate;
+                const nextDate = new Date(currentDate);
+
+                if (currentDate < new Date('1939-09-01')) {
+                    nextDate.setMonth(nextDate.getMonth() + 1);
+                } else {
+                    nextDate.setDate(nextDate.getDate() + 1);
+                }
+
+                gameState.game.currentDate = nextDate;
+                gameState.game.daysPassed++;
+
+                this.checkHistoricalEvents();
+                this.applyTimeEffects();
+                RenderEngine.update();
+            },
+            checkHistoricalEvents() {
+                const dateStr = gameState.game.currentDate.toISOString().split('T')[0];
+                const event = HISTORICAL_EVENTS.find(e => e.date === dateStr);
+
+                if (event && gameState.game.eventIndex <= HISTORICAL_EVENTS.indexOf(event)) {
+                    gameState.game.eventIndex = HISTORICAL_EVENTS.indexOf(event) + 1;
+                    this.showEvent(event);
+                }
+            },
+            showEvent(event) {
+                const modal = document.getElementById('event-modal');
+                document.getElementById('event-title').textContent = event.title;
+                document.getElementById('event-text').innerHTML = `<p>${event.description}</p>`;
+                
+                if (event.effects) {
+                    if (event.effects.morale) gameState.character.morale = Math.max(0, Math.min(100, gameState.character.morale + event.effects.morale));
+                    if (event.effects.ideology) gameState.character.ideology = Math.max(0, Math.min(100, gameState.character.ideology + event.effects.ideology));
+                }
+
+                document.getElementById('event-choices').innerHTML = '<button onclick="document.getElementById(\'event-modal\').classList.remove(\'active\')">Continuer</button>';
+                modal.classList.add('active');
+            },
+            applyTimeEffects() {
+                if (gameState.character.stress > 0) gameState.character.stress = Math.max(0, gameState.character.stress - 1);
+                if (Math.random() < 0.1) gameState.character.skills.rifle += 0.1;
+                CareerSystem.gainExperience(Math.floor(Math.random() * 5) + 1);
+                CareerSystem.checkPromotion();
+            },
+            saveGame() {
+                localStorage.setItem('eisernes_kreuz_save', JSON.stringify(gameState));
+                alert('Partie sauvegardée!');
+            },
+            loadGame() {
+                const save = localStorage.getItem('eisernes_kreuz_save');
+                if (save) {
+                    gameState = JSON.parse(save);
+                    RenderEngine.update();
+                } else {
+                    alert('Aucune sauvegarde trouvée.');
+                }
+            }
+        };
+
+        // ============ INITIALISATION ============
+        document.getElementById('continue-button').addEventListener('click', () => GameEngine.advanceTime());
+        document.getElementById('save-button').addEventListener('click', () => GameEngine.saveGame());
+        document.getElementById('load-button').addEventListener('click', () => GameEngine.loadGame());
+
+        window.addEventListener('load', () => {
+            RenderEngine.update();
+        });
+    </script>
+</body>
+</html>
