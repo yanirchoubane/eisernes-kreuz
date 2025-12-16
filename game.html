@@ -566,34 +566,34 @@
             <h1>Eisernes Kreuz</h1>
             <div class="nav-section">
                 <h3>Général</h3>
-                <button class="nav-button active" onclick="showPage("dashboard")">Tableau de Bord</button>
-                <button class="nav-button" onclick="showPage("actions")">Actions</button>
-                <button class="nav-button" onclick="showPage("missions")">Missions</button>
+                <button class="nav-button active" onclick="showPage('dashboard')">Tableau de Bord</button>
+                <button class="nav-button" onclick="showPage('actions')">Actions</button>
+                <button class="nav-button" onclick="showPage('missions')">Missions</button>
             </div>
             <div class="nav-section">
                 <h3>Personnage</h3>
-                <button class="nav-button" onclick="showPage("career")">Carrière</button>
-                <button class="nav-button" onclick="showPage("skills")">Compétences</button>
-                <button class="nav-button" onclick="showPage("inventory")">Inventaire</button>
-                <button class="nav-button" onclick="showPage("decorations")">Décorations</button>
+                <button class="nav-button" onclick="showPage('career')">Carrière</button>
+                <button class="nav-button" onclick="showPage('skills')">Compétences</button>
+                <button class="nav-button" onclick="showPage('inventory')">Inventaire</button>
+                <button class="nav-button" onclick="showPage('decorations')">Décorations</button>
             </div>
             <div class="nav-section">
                 <h3>Social</h3>
-                <button class="nav-button" onclick="showPage("relations")">Relations</button>
-                <button class="nav-button" onclick="showPage("messages")">Messages</button>
+                <button class="nav-button" onclick="showPage('relations')">Relations</button>
+                <button class="nav-button" onclick="showPage('messages')">Messages</button>
             </div>
             <div class="nav-section">
                 <h3>Monde</h3>
-                <button class="nav-button" onclick="showPage("map")">Carte</button>
+                <button class="nav-button" onclick="showPage('map')">Carte</button>
             </div>
             <div class="nav-section">
                 <h3>Santé</h3>
-                <button class="nav-button" onclick="showPage("health")">Physique</button>
-                <button class="nav-button" onclick="showPage("mental")">Mental</button>
+                <button class="nav-button" onclick="showPage('health')">Physique</button>
+                <button class="nav-button" onclick="showPage('mental')">Mental</button>
             </div>
             <div class="nav-section">
                 <h3>Autres</h3>
-                <button class="nav-button" onclick="showPage("journal")">Journal</button>
+                <button class="nav-button" onclick="showPage('journal')">Journal</button>
                 <button class="nav-button" onclick="resetGame()">Nouvelle Partie</button>
             </div>
         </div>
@@ -1075,7 +1075,25 @@
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
             document.querySelectorAll('.nav-button').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(pageId.toLowerCase()) || 
+                    (pageId === 'dashboard' && btn.textContent.includes('Tableau')) ||
+                    (pageId === 'actions' && btn.textContent === 'Actions') ||
+                    (pageId === 'missions' && btn.textContent === 'Missions') ||
+                    (pageId === 'career' && btn.textContent === 'Carrière') ||
+                    (pageId === 'skills' && btn.textContent === 'Compétences') ||
+                    (pageId === 'inventory' && btn.textContent === 'Inventaire') ||
+                    (pageId === 'decorations' && btn.textContent === 'Décorations') ||
+                    (pageId === 'relations' && btn.textContent === 'Relations') ||
+                    (pageId === 'messages' && btn.textContent === 'Messages') ||
+                    (pageId === 'map' && btn.textContent === 'Carte') ||
+                    (pageId === 'health' && btn.textContent === 'Physique') ||
+                    (pageId === 'mental' && btn.textContent === 'Mental') ||
+                    (pageId === 'journal' && btn.textContent === 'Journal')) {
+                    btn.classList.add('active');
+                }
+            });
             if (pageId === 'dashboard' && gameState.gameStarted) updateDashboard();
             if (pageId === 'relations' && gameState.gameStarted) updateRelations();
             if (pageId === 'messages' && gameState.gameStarted) updateMessages();
